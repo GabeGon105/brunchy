@@ -4,10 +4,19 @@ const CommentSchema = new mongoose.Schema({
   text: {
     type: String
   },
-  user: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "User",
+    autopopulate: true
+  },
+  userName: {
+    type: String,
+    required: true,
+    autopopulate: true
+  },
+  userImage: {
+    type: String,
+    required: true,
     autopopulate: true
   },
   post: {
@@ -19,7 +28,11 @@ const CommentSchema = new mongoose.Schema({
     ref: "Comment",
   },
   deleted: { type: Boolean },
-  edited: { type: Boolean }
+  edited: { type: Boolean },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  }
 }, {
   toObject: { virtuals: true }
 });

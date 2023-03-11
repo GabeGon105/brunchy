@@ -43,7 +43,7 @@ export default function Root() {
       {user ? (
         <header className="navbar bg-accent text-neutral-content sticky top-0 z-10">
           {/* Brunchy logo and link to profile */}
-          <Link to={user ? "/profile" : "/"} className="flex">
+          <Link to={user ? `/profile/${user._id}` : "/"} className="flex">
             <button className="font-bold btn btn-ghost py-0 px-2">
               <img
                 src={brunchy}
@@ -94,7 +94,7 @@ export default function Root() {
           </Link>
           {/* Search button */}
           <Link
-            to={user ? "/profile" : "/"}
+            to={user ? `/profile/${user._id}` : "/"}
             className="text-primary w-1/5 btn btn-ghost"
           >
             <img
@@ -118,7 +118,7 @@ export default function Root() {
           </Link>
           {/* Saved Posts button */}
           <Link
-            to={user ? "/profile" : "/"}
+            to={user ? `/profile/${user._id}` : "/"}
             className="text-primary w-1/5 btn btn-ghost"
           >
             <img
@@ -130,7 +130,7 @@ export default function Root() {
           </Link>
           {/* Profile button */}
           <Link
-            to={user ? "/profile" : "/"}
+            to={user ? `/profile/${user._id}` : "/"}
             className="text-primary w-1/5 btn btn-ghost"
           >
             <img

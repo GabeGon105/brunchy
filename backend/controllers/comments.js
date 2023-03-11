@@ -5,7 +5,9 @@ module.exports = {
     try {
       const comment = await Comment.create({
         text: req.body.text,
-        user: req.user.id,
+        userId: req.user.id,
+        userName: req.user.userName,
+        userImage: req.user.image,
 				post: req.params.commentId ? undefined : req.params.postId,
         comment: req.params.commentId
       });
@@ -17,17 +19,14 @@ module.exports = {
   },
   deleteComment: async (req, res) => {
     try {
+      // Find comment by id
       const comment = await Comment.findById(req.params.commentId).populate('comments');
-      if (!comment.comments.length){
-        await comment.remove()
-        console.log("Comment has been deleted!");
-        return res.json(null)
-      }
-      comment.text = '';
-      comment.deleted = true;
-      const deletedComment = await comment.save();
-      console.log("Comment has been cleared!");
-      res.json(deletedComment)
+
+      await comment.remove()
+      console.log("Comment has been deleted!");
+      // return success message
+      req.flash("success", { msg: "Comment has been deleted!" });
+      return res.json({ messages: req.flash() });
     } catch (err) {
       console.log(err);
     }
@@ -39,7 +38,9 @@ module.exports = {
       comment.edited = true;
       const updatedComment = await comment.save();
       console.log("Comment has been edited!");
-      res.json(updatedComment)
+      // return success message
+      req.flash("success", { msg: "Comment has been edited!" });
+      return res.json({ messages: req.flash(), updatedComment });
     }
     catch (err) {
       console.log(err);

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { API_BASE } from "../constants";
 import brunchy from "../images/brunchy-color.png";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 export default function Signup() {
   const { setUser, setMessages } = useOutletContext();
@@ -29,7 +29,7 @@ export default function Signup() {
     }
     if (json.user) {
       setUser(json.user);
-      navigate("/profile");
+      navigate(`/profile/${json.user._id}`);
     }
   };
 
@@ -59,21 +59,27 @@ export default function Signup() {
             onSubmit={handleSubmit}
             className="card-body"
           >
+            {/* Username input */}
             <div className="form-control border-0 bg-base-100">
               <input
                 id="userName"
                 name="userName"
                 type="text"
+                required
+                maxLength="30"
                 placeholder="Username"
                 className="input input-bordered drop-shadow-md text-neutral"
               />
             </div>
             <div className="form-control border-0 bg-base-100">
+              {/* Email input */}
               <input
                 id="exampleInputEmail1"
                 aria-describedby="emailHelp"
                 name="email"
                 type="email"
+                required
+                maxLength="350"
                 placeholder="Email"
                 className="input input-bordered drop-shadow-md text-neutral"
               />
@@ -86,6 +92,8 @@ export default function Signup() {
                 id="password"
                 name="password"
                 type="password"
+                required
+                maxLength="30"
                 placeholder="Password"
                 className="input input-bordered drop-shadow-md text-neutral"
               />
@@ -95,6 +103,8 @@ export default function Signup() {
                 id="confirmPassword"
                 name="confirmPassword"
                 type="password"
+                required
+                maxLength="30"
                 placeholder="Confirm Password"
                 className="input input-bordered drop-shadow-md text-neutral"
               />

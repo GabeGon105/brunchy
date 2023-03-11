@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { API_BASE } from "../constants";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import brunchy from "../images/brunchy-color.png";
 
 export default function Index() {
-  const { setUser, setMessages } = useOutletContext();
+  const { user, setUser, setMessages } = useOutletContext();
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -29,7 +29,7 @@ export default function Index() {
     }
     if (json.user) {
       setUser(json.user);
-      navigate("/profile");
+      navigate(`/profile/${json.user._id}`);
     }
   };
 

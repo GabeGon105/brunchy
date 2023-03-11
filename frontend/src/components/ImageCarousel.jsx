@@ -20,6 +20,10 @@ const ImageCarousel = ({ images, caption }) => (
     navigation={true}
     modules={[Navigation, Pagination, Zoom]}
     className="mySwiper"
+    style={{
+      "--swiper-pagination-color": "#7EC1C6",
+      "--swiper-navigation-color": "#7EC1C6",
+    }}
   >
     {images.map((image, i) => {
       return (

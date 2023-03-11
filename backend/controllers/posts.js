@@ -7,12 +7,22 @@ const User = require("../models/User")
 module.exports = {
   getProfile: async (req, res) => {
     try {
-      const posts = await Post.find({ user: req.user.id }).populate('likes').lean();
-      res.json(posts);
+      const posts = await Post.find({ user: req.params.id }).populate('likes').lean();
+      const profileUser = await User.findById( req.params.id )
+      res.json({posts, profileUser});
     } catch (err) {
       console.log(err);
     }
   },
+  // getProfileOther: async (req, res) => {
+  //   try {
+  //     console.log(req.params.id);
+  //     const posts = await Post.find({ user: req.params.id }).populate('likes').lean();
+  //     res.json(posts);
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // },
   getFeed: async (req, res) => {
     try {
       const posts = await Post.find().sort({ createdAt: "desc" }).populate('likes').lean();
@@ -25,14 +35,32 @@ module.exports = {
     try {
       const post = await Post.findById(req.params.id).populate('likes').populate({
         path: 'comments',
-        populate: { path: 'user' }
+        populate: { path: 'userId' }
       })
+      // find the user of the user who created this post
+      const postUser = await User.findById(post.user);
+
       // Find a like on this post by the logged in user and assign to a variable to act essentially as a boolean
       const like = await Like.find({ user: req.user.id, post: req.params.id })
+
+      // Find all likes on this post and assign to a variable
+      const likesArr = await Like.find({ post: req.params.id })
+      
+      // Map through likesArr and find the userObj for each like
+      const likesUsersArrPromise = likesArr.map( async (like) => {
+        const likeUser = await User.findById( like.user );
+        return [likeUser._id, likeUser.userName, likeUser.image, likeUser.bio];
+      } )
+
+      // Await all the likesUsersrrPromise functions in Promise.all
+      const likesUsersArr = await Promise.all(likesUsersArrPromise);
+
       // Find if the logged in user has saved this post and assign to a variable to act essentially as a boolean
       const save = await User.find({ _id: req.user.id, postsSaved: req.params.id });
+
       const comments = post.toObject().comments
-      res.json({ post: post.toObject() || null, comments, like, save });
+
+      res.json({ post: post.toObject() || null, comments: comments, like, save, postUserId: postUser._id, postUserName: postUser.userName , likesUsersArr: likesUsersArr});
     } catch (err) {
       console.log(err);
     }
@@ -87,13 +115,32 @@ module.exports = {
   likePost: async (req, res) => {
     try {
       const obj = { user: req.user.id, post: req.params.id };
+      let change = 0;
       if ((await Like.deleteOne(obj)).deletedCount) {
         console.log("Likes -1");
-        return res.json(-1)
+        change = -1;
       }
-      await Like.create(obj);
-      console.log("Likes +1");
-      res.json(1)
+      else {
+        await Like.create(obj);
+        console.log("Likes +1");
+        change = 1
+      }
+
+      // Find all likes on this post and assign to a variable
+      const likesArr = await Like.find({ post: req.params.id })
+      
+      // Map through likesArr and find the userObj for each like
+      const likesUsersArrPromise = likesArr.map( async (like) => {
+        const likeUser = await User.findById( like.user );
+        return [likeUser._id, likeUser.userName, likeUser.image, likeUser.bio.slice(0, 30)];
+      } )
+
+      // Await all the likesUsersrrPromise functions in Promise.all
+      const likesUsersArr = await Promise.all(likesUsersArrPromise);
+
+
+
+      res.json({ change, likesUsersArr })
     } catch (err) {
       console.log(err);
     }
@@ -125,8 +172,10 @@ module.exports = {
     try {
       // Find post by id
       let post = await Post.findById({ _id: req.params.id }).populate('likes').populate('comments');
-      // Delete image from cloudinary
-      await cloudinary.uploader.destroy(post.cloudinaryId);
+      // Loop through each element in post.image array and delete each image from cloudinary
+      post.cloudinaryId.forEach( async (id) => {
+        await cloudinary.uploader.destroy(id)
+      } )
       // Delete post from db
       const commentIDs = [];
       const comments = post.comments;
@@ -146,4 +195,22 @@ module.exports = {
       res.redirect("/profile");
     }
   },
+  editPost: async (req, res) => {
+    try {
+      const post = await Post.findById(req.params.id);
+      post.title = req.body.title
+      post.naverLink = req.body.naverLink
+      post.caption = req.body.caption;
+      post.edited = true;
+      post.type = req.body.type;
+      const updatedPost = await post.save();
+      console.log("Post has been edited!");
+      // return success message
+      req.flash("success", { msg: "Post has been edited!" });
+      return res.json({ messages: req.flash(), updatedPost });
+    }
+    catch (err) {
+      console.log(err);
+    }
+}
 };

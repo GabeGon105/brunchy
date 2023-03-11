@@ -1,82 +1,171 @@
-export default function Comment({ postId, userId, comment, depth, deleteComment, updateComment, addComment }) {
-	return (
-		<div className="accordion" id={"viewCommentAccordian-" + comment._id}>
-			<div className="accordion-item">
-				<h2 className="accordion-header" id={"viewCommentHeading-" + comment._id}>
-					<button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target={"#viewCommentCollapse-" + comment._id} aria-expanded="false" aria-controls={"viewCommentCollapse-" + comment._id}>
-						{comment.deleted ? 'Deleted' : <>
-							{comment.user.userName}
-							{comment.edited ? <span className="fa fa-asterisk" style={{ color: 'red' }}></span> : null}
-						</>}
-					</button>
-				</h2>
-				<div id={"viewCommentCollapse-" + comment._id} className="accordion-collapse collapse show" aria-labelledby={"viewCommentHeading-" + comment._id} data-bs-parent={"#viewCommentAccordian-" + comment._id}>
-					<div className="accordion-body">
-						<div className="justify-content-between">
-							{!comment.deleted && comment.user._id === userId ? <>
-								<form
-									action={`/api/comment/deleteComment/${postId}/${comment._id}?_method=DELETE`}
-									method="POST"
-									style={{ float: 'right' }}
-									onSubmit={deleteComment.bind(null, comment._id)}
-								>
-									<div className="btn-group" role="group" aria-label="Comment Actions">
-										<button className="btn btn-danger fa fa-trash" type="submit"></button>
-										<button type="button" className="btn btn-warning fa fa-edit" data-bs-toggle="modal" data-bs-target={"#editComment-" + comment._id}></button>
-									</div>
-								</form>
-							</> : null}
+import { useRef } from "react";
+import { Link } from "react-router-dom";
+export default function Comment({
+  postId,
+  currentUserId,
+  comment,
+  deleteComment,
+  updateComment,
+  postUserId,
+}) {
+  // call a click event to close the Edit Comment drop-down, and call a click event to close the Edit/Delete comment modal when the Sumbit Edit Comment button is clicked
+  const editCommentRef = useRef(null);
+  const editDeleteCommentRef = useRef(null);
+  const handleClick = () => {
+    editCommentRef.current.click();
+    editDeleteCommentRef.current.click();
+  };
+  return (
+    <div className="chat chat-start" id={comment._id}>
+      <div className="chat-image avatar">
+        <div className="w-12 rounded-full">
+          <Link to={`/profile/${comment.userId}`}>
+            <img
+              src={comment.userImage}
+              alt="user profile photo"
+              className="hover:opacity-50"
+            />
+          </Link>
+        </div>
+      </div>
+      <div className="chat-header text-neutral break-words flex">
+        <Link to={`/profile/${comment.userId}`}>
+          <span className="text-base self-end hover:text-cyan-500">
+            {comment.userName}
+          </span>
+        </Link>
+        {/* <time className="text-xs opacity-50">12:45</time> */}
 
-							{comment.deleted ? null : comment.text}
-							{!comment.deleted && comment.user._id === userId ? <>
-								<div className="modal fade" id={"editComment-" + comment._id} tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-									<div className="modal-dialog">
-										<form className="modal-content" action={`/api/comment/editComment/${postId}/${comment._id}?_method=PATCH`} method="POST" onSubmit={updateComment.bind(null, comment._id)}>
-											<div className="modal-header">
-												<h5 className="modal-title" id="exampleModalLabel">Edit Comment</h5>
-												<button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Cancel"></button>
-											</div>
-											<div className="modal-body">
-												<div className="mb-3">
-													<label htmlFor="text" className="form-label">Edited Comment</label>
-													<textarea className="form-control" id="text" name="text" defaultValue={comment.text}></textarea>
-												</div>
-											</div>
-											<div className="modal-footer">
-												<button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-												<button className="btn btn-primary">Update Comment</button>
-											</div>
-										</form>
-									</div>
-								</div>
-							</> : null}
-						</div>
-						<div className="accordion" id={"addCommentAccordian-" + comment._id}>
-							<div className="accordion-item">
-								<h2 className="accordion-header" id={"addCommentHeading-" + comment._id}>
-									<button className="accordion-button collapsed" style={{ backgroundColor: 'hsl(190, 100%, 85%)' }} type="button" data-bs-toggle="collapse" data-bs-target={"#addCommentCollapse-" + comment._id} aria-expanded="false" aria-controls={"addCommentCollapse-" + comment._id}>
-										Add Comment
-									</button>
-								</h2>
-								<div id={"addCommentCollapse-" + comment._id} className="accordion-collapse collapse" aria-labelledby={"addCommentHeading-" + comment._id} data-bs-parent={"#addCommentAccordian-" + comment._id}>
-									<div className="accordion-body">
-										<form action={`/api/comment/createComment/${postId}/` + comment._id} method="POST" onSubmit={addComment.bind(null, comment._id)}>
-											<div className="mb-3">
-												<label htmlFor="text" className="form-label">Text</label>
-												<textarea className="form-control" id="text" name="text"></textarea>
-											</div>
-											<button type="submit" className="btn btn-primary">Submit</button>
-										</form>
-									</div>
-								</div>
-							</div>
-						</div>
-						{(comment.comments || []).map(subComment =>
-							<Comment key={subComment._id} postId={postId} userId={userId} comment={subComment} depth={depth + 1} deleteComment={deleteComment} updateComment={updateComment} addComment={addComment} />
-						)}
-					</div>
-				</div>
-			</div>
-		</div>
-	)
+        {/* If the comment user's id matches the current user OR if the post user's id matches the current user, allow the user to delete the comment */}
+        <div className="">
+          {!comment.deleted &&
+          (comment.userId === currentUserId || postUserId === currentUserId) ? (
+            <>
+              {/* The button to open modal */}
+              <label
+                htmlFor={`modal-${comment._id}`}
+                className="ml-2 btn btn-sm btn-ghost text-lg pt-0"
+              >
+                ...
+              </label>
+
+              {/* Put this part before </body> tag */}
+              <input
+                type="checkbox"
+                id={`modal-${comment._id}`}
+                className="modal-toggle"
+              />
+              <label
+                htmlFor={`modal-${comment._id}`}
+                className="modal modal-bottom sm:modal-middle cursor-pointer"
+                ref={editDeleteCommentRef}
+              >
+                <label className="modal-box relative" htmlFor="">
+                  <div>
+                    <ul
+                      className="flex flex-col items-center"
+                      role="group"
+                      aria-label="Comment Actions"
+                    >
+                      <li className="">
+                        <form
+                          action={`/api/comment/deleteComment/${postId}/${comment._id}?_method=DELETE`}
+                          method="POST"
+                          onSubmit={deleteComment.bind(null, comment._id)}
+                        >
+                          <button
+                            className="btn btn-error w-52 text-neutral"
+                            type="submit"
+                          >
+                            Delete comment
+                          </button>
+                        </form>
+                      </li>
+                      {/* If the comment user's id matches the current user's id, allow the user to edit the comment */}
+                      {comment.userId === currentUserId ? (
+                        <li className="flex flex-col items-center mt-4 w-full">
+                          {/* Collapsable form */}
+                          <button
+                            className="btn btn-accent w-52 text-neutral"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target={`#editComment-${comment._id}-formCollapse`}
+                            aria-expanded="true"
+                            aria-controls={`editComment-${comment._id}-formCollapse`}
+                            ref={editCommentRef}
+                          >
+                            Edit comment
+                          </button>
+                          <div
+                            className="collapse w-full"
+                            id={`editComment-${comment._id}-formCollapse`}
+                          >
+                            <div className="mt-2 rounded-lg bg-base-100 my-3 flex flex-col items-center">
+                              {/* <p className="w-3/4 text-center text-neutral font-semibold">
+                              Previous comment:{" "}
+                              <span className="text-neutral font-normal">
+                                {comment.text}
+                              </span>
+                            </p> */}
+                              {/* Edit comment upload form */}
+                              <form
+                                action={`/api/comment/editComment/${postId}/${comment._id}?_method=PATCH`}
+                                method="POST"
+                                onSubmit={updateComment.bind(null, comment._id)}
+                                className="flex flex-col items-center mt-2 w-full"
+                              >
+                                {/* Flex container for text area input */}
+                                <div className="w-3/4 md:flex mb-3">
+                                  <textarea
+                                    className="textarea textarea-primary w-full text-neutral"
+                                    required
+                                    rows="3"
+                                    id="text"
+                                    name="text"
+                                    defaultValue={comment.text}
+                                  ></textarea>
+                                </div>
+
+                                {/* Edit comment submit button */}
+                                <button
+                                  type="submit"
+                                  className="btn btn-primary w-52 text-neutral"
+                                  value="Upload"
+                                  onClick={handleClick}
+                                >
+                                  Submit edit
+                                </button>
+                              </form>
+                            </div>
+                          </div>
+                        </li>
+                      ) : null}
+                    </ul>
+                    <div className="modal-action flex justify-center mt-3">
+                      <label
+                        htmlFor={`modal-${comment._id}`}
+                        className="underline  text-neutral cursor-pointer"
+                      >
+                        Cancel
+                      </label>
+                    </div>
+                  </div>
+                </label>
+              </label>
+            </>
+          ) : null}
+        </div>
+      </div>
+      {!comment.deleted ? (
+        <p className="chat-bubble bg-accent text-neutral break-words">
+          {comment.text}
+        </p>
+      ) : null}
+
+      {/* <div className="chat-footer opacity-50">Delivered</div> */}
+      <div className="chat-footer text-xs">
+        {comment.edited ? "Edited" : null}
+      </div>
+    </div>
+  );
 }

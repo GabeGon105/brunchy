@@ -1,21 +1,33 @@
-import { useEffect, useState } from "react";
-import { Link, useOutletContext } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { Link, useOutletContext, useParams } from "react-router-dom";
 import PostList from "../components/PostList";
 import { API_BASE } from "../constants";
 import "../style.css";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import create from "../images/create-color.png";
 
-export function Profile() {
+export default function Profile() {
   const { user, setMessages } = useOutletContext();
+  const [profileUser, setProfileUser] = useState();
+  const profileId = useParams().id;
   const [image, setImage] = useState({ preview: "", data: "" });
   const [posts, setPosts] = useState([]);
 
+  const createPostRef = useRef(null);
+  const handleClick = () => {
+    createPostRef.current.click();
+  };
+
   useEffect(() => {
-    fetch(API_BASE + "/api/profile", { credentials: "include" })
+    fetch(API_BASE + `/api/profile/${profileId}`, {
+      credentials: "include",
+    })
       .then((res) => res.json())
-      .then((data) => setPosts(data));
-  }, []);
+      .then(({ posts, profileUser }) => {
+        setProfileUser(profileUser);
+        setPosts(posts);
+      });
+  }, [setProfileUser, profileId]);
 
   if (!user) return null;
 
@@ -64,32 +76,41 @@ export function Profile() {
         <div className="flex mx-auto">
           <div className="avatar self-center">
             <div className="w-28 rounded-full  shadow-xl ring ring-primary ring-offset-1">
-              <img src={user.image} alt="user profile photo" />
+              <img
+                src={profileUser ? profileUser.image : null}
+                alt="user profile photo"
+              />
             </div>
           </div>
         </div>
 
         {/* Username display */}
-        <h2 className="mt-2 text-2xl font-semibold text-neutral text-center">
-          {user.userName}
+        <h2 className="mt-2 text-2xl font-semibold text-neutral break-words text-center">
+          {profileUser ? profileUser.userName : null}
         </h2>
 
         {/* user bio description */}
         <div className="flex mx-auto">
-          <p className="mt-2 text-m text-center">{user.bio}</p>
+          <p className="mt-2 text-m text-center text-neutral break-words">
+            {profileUser ? profileUser.bio : null}
+          </p>
         </div>
         {/* Container holding number of followers and following */}
         <div className="flex mt-2 w-1/2 self-center">
           <div className="w-1/2">
             <p className="text-m text-neutral text-center">
-              <span className="font-semibold">{user.followers.length}</span>
+              <span className="font-semibold">
+                {profileUser ? profileUser.followers.length : null}
+              </span>
               <br />
               followers
             </p>
           </div>
           <div className="w-1/2">
             <p className="text-m text-neutral text-center">
-              <span className="font-semibold">{user.following.length}</span>
+              <span className="font-semibold">
+                {profileUser ? profileUser.following.length : null}
+              </span>
               <br />
               following
             </p>
@@ -107,6 +128,7 @@ export function Profile() {
           data-bs-target="#postFormCollapse"
           aria-expanded="false"
           aria-controls="postFormCollapse"
+          ref={createPostRef}
         >
           <img
             src={create}
@@ -132,6 +154,7 @@ export function Profile() {
                     <input
                       type="text"
                       required
+                      maxLength="50"
                       placeholder="Location name"
                       className="input input-bordered input-primary w-full"
                       id="title"
@@ -143,6 +166,7 @@ export function Profile() {
                     <input
                       type="text"
                       required
+                      maxLength="100"
                       placeholder="Naver / Kakao Maps link"
                       className="input input-bordered input-primary w-full"
                       id="naverLink"
@@ -153,6 +177,7 @@ export function Profile() {
                   <div className="mb-3">
                     <textarea
                       required
+                      maxLength="2000"
                       className="textarea textarea-primary w-full"
                       placeholder="Description"
                       id="caption"
@@ -193,6 +218,7 @@ export function Profile() {
                 type="submit"
                 className="btn btn-primary w-32"
                 value="Upload"
+                onClick={handleClick}
               >
                 Post
               </button>

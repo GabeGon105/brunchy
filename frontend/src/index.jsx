@@ -1,22 +1,22 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import React from "react";
+import ReactDOM from "react-dom/client";
 import {
   createBrowserRouter,
   RouterProvider,
   Route,
   Link,
 } from "react-router-dom";
-import './style.css';
-import App from './App';
-import Root from './routes/Root';
-import ErrorPage from './routes/ErrorPage';
-import Login from './routes/Login';
-import Signup from './routes/Signup';
-import Index from './routes/Index';
-import { Profile } from './routes/Profile';
-import Logout from './routes/Logout';
-import Feed from './routes/Feed';
-import Post from './routes/Post';
+import "./style.css";
+import App from "./App";
+import Root from "./routes/Root";
+import ErrorPage from "./routes/ErrorPage";
+import Login from "./routes/Login";
+import Signup from "./routes/Signup";
+import Index from "./routes/Index";
+import Profile from "./routes/Profile";
+import Logout from "./routes/Logout";
+import Feed from "./routes/Feed";
+import Post from "./routes/Post";
 
 const router = createBrowserRouter([
   {
@@ -26,7 +26,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Index />
+        element: <Index />,
       },
       {
         path: "/login",
@@ -41,7 +41,7 @@ const router = createBrowserRouter([
         element: <Signup />,
       },
       {
-        path: "/profile",
+        path: "/profile/:id",
         element: <Profile />,
       },
       {
@@ -52,11 +52,11 @@ const router = createBrowserRouter([
         path: "/post/:id",
         element: <Post />,
       },
-    ]
+    ],
   },
 ]);
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <RouterProvider router={router} />
