@@ -46,73 +46,81 @@ export default function Signup() {
             <Link to="/">Brunchy</Link>
           </h1>
           <p className="py-6 text-neutral">
-            Explore your city through breakfasts, bakeries, and brunches with
+            Explore your city through brunches, breakfasts, and bakeries with
             Brunchy!
           </p>
         </div>
 
         {/* Sign Up Form */}
-        <div className="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
-          <form
-            action="/signup"
-            method="POST"
-            onSubmit={handleSubmit}
-            className="card-body"
-          >
-            {/* Username input */}
+        <div className="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100 ml-10">
+          <div className="card-body">
+            <form
+              action="/signup"
+              method="POST"
+              onSubmit={handleSubmit}
+              className=""
+            >
+              {/* Username input */}
+              <div className="form-control border-0 bg-base-100">
+                <input
+                  id="userName"
+                  name="userName"
+                  type="text"
+                  required
+                  maxLength="30"
+                  placeholder="Username"
+                  className="input input-bordered drop-shadow-md text-neutral"
+                />
+              </div>
+              <div className="form-control border-0 bg-base-100">
+                {/* Email input */}
+                <input
+                  id="exampleInputEmail1"
+                  aria-describedby="emailHelp"
+                  name="email"
+                  type="email"
+                  required
+                  maxLength="350"
+                  placeholder="Email"
+                  className="input input-bordered drop-shadow-md text-neutral"
+                />
+                <span id="emailHelp" className="form-text text-neutral">
+                  * We'll never share your email with anyone.
+                </span>
+              </div>
+              <div className="form-control border-0 bg-base-100">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  maxLength="30"
+                  placeholder="Password"
+                  className="input input-bordered drop-shadow-md text-neutral"
+                />
+              </div>
+              <div className="form-control border-0 bg-base-100">
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  required
+                  maxLength="30"
+                  placeholder="Confirm Password"
+                  className="input input-bordered drop-shadow-md text-neutral"
+                />
+              </div>
+              <div className="form-control mt-6 border-0 bg-base-100">
+                <button className="btn btn-primary shadow-md">Sign Up</button>
+              </div>
+            </form>
+            <div className="divider text-neutral">or</div>
             <div className="form-control border-0 bg-base-100">
-              <input
-                id="userName"
-                name="userName"
-                type="text"
-                required
-                maxLength="30"
-                placeholder="Username"
-                className="input input-bordered drop-shadow-md text-neutral"
-              />
+              <Link to="/" className="btn btn-secondary shadow-md">
+                Login
+              </Link>
             </div>
-            <div className="form-control border-0 bg-base-100">
-              {/* Email input */}
-              <input
-                id="exampleInputEmail1"
-                aria-describedby="emailHelp"
-                name="email"
-                type="email"
-                required
-                maxLength="350"
-                placeholder="Email"
-                className="input input-bordered drop-shadow-md text-neutral"
-              />
-              <span id="emailHelp" className="form-text text-neutral">
-                * We'll never share your email with anyone.
-              </span>
-            </div>
-            <div className="form-control border-0 bg-base-100">
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                maxLength="30"
-                placeholder="Password"
-                className="input input-bordered drop-shadow-md text-neutral"
-              />
-            </div>
-            <div className="form-control border-0 bg-base-100">
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                required
-                maxLength="30"
-                placeholder="Confirm Password"
-                className="input input-bordered drop-shadow-md text-neutral"
-              />
-            </div>
-            <div className="form-control mt-6 border-0 bg-base-100">
-              <button className="btn btn-primary shadow-md">Sign Up</button>
-            </div>
-          </form>
+          </div>
         </div>
       </div>
     </main>

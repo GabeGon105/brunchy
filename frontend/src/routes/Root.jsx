@@ -12,18 +12,22 @@ import search from "../images/search-color.png";
 import random from "../images/random-color.png";
 import saved from "../images/saved-color.png";
 import notification from "../images/notification-color.png";
-import create from "../images/create-color.png";
 import profileSketch from "../images/profile-sketch-color.png";
 import logout from "../images/logout-color.png";
 
 export default function Root() {
   const [user, setUser] = useState();
+  const [everyPostId, setEveryPostId] = useState();
   const [messages, setMessages] = useState({});
+  const [randomPostButtonDisabled, setRandomPostButtonDisabled] =
+    useState(false);
 
   useEffect(() => {
     fetch(API_BASE + "/api/user", { credentials: "include" })
       .then((res) => res.json())
-      .then((res) => setUser(res.user));
+      .then((res) => {
+        setUser(res.user);
+      });
   }, []);
 
   useEffect(() => {
@@ -37,11 +41,16 @@ export default function Root() {
     return () => window.removeEventListener("keydown", listener);
   }, []);
 
+  const randomPostId = () => {
+    const randomNum = Math.floor(Math.random() * everyPostId.length);
+    return everyPostId[randomNum];
+  };
+
   return (
     <div className="bg-base-200 pb-20 min-h-screen">
       {/* If logged in, display the top navbar */}
       {user ? (
-        <header className="navbar bg-accent text-neutral-content sticky top-0 z-10">
+        <header className="navbar bg-accent text-neutral-content sticky top-0 z-20">
           {/* Brunchy logo and link to profile */}
           <Link to={user ? `/profile/${user._id}` : "/"} className="flex">
             <button className="font-bold btn btn-ghost py-0 px-2">
@@ -82,7 +91,7 @@ export default function Root() {
       ) : null}
       {/* If logged in, display the bottom nav bar */}
       {user ? (
-        <div className="menu btm-nav bg-accent z-10">
+        <div className="menu btm-nav bg-accent z-20">
           {/* Feed button */}
           <Link to={user ? "/feed" : "/"} className="w-1/5 btn btn-ghost">
             <img
@@ -94,7 +103,7 @@ export default function Root() {
           </Link>
           {/* Search button */}
           <Link
-            to={user ? `/profile/${user._id}` : "/"}
+            to={user ? `/search` : "/"}
             className="text-primary w-1/5 btn btn-ghost"
           >
             <img
@@ -106,8 +115,15 @@ export default function Root() {
           </Link>
           {/* Random post button? */}
           <Link
-            to={user ? "/feed" : "/"}
+            to={user && everyPostId ? `/post/${randomPostId()}` : "/"}
             className="text-primary w-1/5 btn btn-ghost"
+            disabled={randomPostButtonDisabled}
+            onClick={() => {
+              setRandomPostButtonDisabled(true);
+              setTimeout(() => {
+                setRandomPostButtonDisabled(false);
+              }, 500);
+            }}
           >
             <img
               src={random}
@@ -118,7 +134,7 @@ export default function Root() {
           </Link>
           {/* Saved Posts button */}
           <Link
-            to={user ? `/profile/${user._id}` : "/"}
+            to={user ? `/saved` : "/"}
             className="text-primary w-1/5 btn btn-ghost"
           >
             <img
@@ -144,7 +160,7 @@ export default function Root() {
       ) : null}
       <Messages messages={messages} />
       <ToastContainer className="top-16" position="top-left" autoClose={2000} />
-      <Outlet context={{ user, setUser, setMessages }} />
+      <Outlet context={{ user, setUser, setMessages, setEveryPostId }} />
     </div>
   );
 }

@@ -8,28 +8,19 @@ export default function Feed() {
   const { user, setEveryPostId } = useOutletContext();
   const [posts, setPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
-  const [followingFilter, setFollowingFilter] = useState(false);
   const [brunchFilter, setBrunchFilter] = useState(true);
   const [breakfastFilter, setBreakfastFilter] = useState(true);
   const [bakeryFilter, setBakeryFilter] = useState(true);
 
   useEffect(() => {
-    fetch(API_BASE + "/api/feed", { credentials: "include" })
+    fetch(API_BASE + "/api/saved", { credentials: "include" })
       .then((res) => res.json())
-      .then(({ posts, everyPostId }) => {
-        setPosts(posts);
+      .then(({ savedPosts, everyPostId }) => {
+        setPosts(savedPosts);
         setEveryPostId(everyPostId);
-        setFilteredPosts(posts);
+        setFilteredPosts(savedPosts);
       });
   }, []);
-
-  const handleFollowingFilter = () => {
-    // change followingFilter to the opposite of it's previous state
-    setFollowingFilter(!followingFilter);
-  };
-  useEffect(() => {
-    handlePostsFilter();
-  }, [followingFilter]);
 
   const handleBrunchFilter = () => {
     // change brunchFilter to the opposite of it's previous state
@@ -82,12 +73,6 @@ export default function Feed() {
           : null
       );
     }
-    // if followingFilter is true, filter through newFilteredPostsArray and return each post only if user.following includes post.user, then reassign newFilteredPostsArray
-    if (followingFilter) {
-      newFilteredPostsArray = newFilteredPostsArray.filter((post) =>
-        user.following.includes(post.user)
-      );
-    }
 
     setFilteredPosts(newFilteredPostsArray);
   };
@@ -108,7 +93,6 @@ export default function Feed() {
     );
 
   const swapOnBadges = [
-    <div className="swap-on badge badge-lg">Following Only</div>,
     <div className="swap-on badge badge-lg badge-primary text-neutral">
       Brunch
     </div>,
@@ -121,7 +105,6 @@ export default function Feed() {
   ];
 
   const swapOffBadges = [
-    <div className="swap-off badge badge-lg badge-outline">Following Only</div>,
     <div className="swap-off badge badge-lg badge-primary badge-outline text-neutral">
       Brunch
     </div>,
@@ -137,41 +120,31 @@ export default function Feed() {
     <div className="container">
       <div className="row justify-content-center mt-4">
         <h2 className="text-center text-neutral font-semibold text-xl mb-3">
-          Explore
+          Saved Posts
         </h2>
-        <div className="flex w-full justify-center mb-4">
-          <SwapIcon
-            className=""
-            key="following-filter"
-            filter={followingFilter}
-            swapOn={swapOnBadges[0]}
-            swapOff={swapOffBadges[0]}
-            click={handleFollowingFilter}
-          />
-        </div>
         <div className="flex w-full sm:w-2/3 md:w-1/2 lg:w1-/3 justify-evenly mb-4">
           <SwapIcon
             className="w-1/3"
             key="brunch-filter"
             filter={brunchFilter}
-            swapOn={swapOnBadges[1]}
-            swapOff={swapOffBadges[1]}
+            swapOn={swapOnBadges[0]}
+            swapOff={swapOffBadges[0]}
             click={handleBrunchFilter}
           />
           <SwapIcon
             className="w-1/3"
             key="breakfast-filter"
             filter={breakfastFilter}
-            swapOn={swapOnBadges[2]}
-            swapOff={swapOffBadges[2]}
+            swapOn={swapOnBadges[1]}
+            swapOff={swapOffBadges[1]}
             click={handleBreakfastFilter}
           />
           <SwapIcon
             className="w-1/3"
             key="bakery-filter"
             filter={bakeryFilter}
-            swapOn={swapOnBadges[3]}
-            swapOff={swapOffBadges[3]}
+            swapOn={swapOnBadges[2]}
+            swapOff={swapOffBadges[2]}
             click={handleBakeryFilter}
           />
         </div>
@@ -183,7 +156,7 @@ export default function Feed() {
         {posts.length !== 0 && filteredPosts.length === 0 && (
           <p className="text-neutral text-center mt-5">
             ʕ•ᴥ•ʔ <br />
-            No posts to show
+            No saved posts to show
           </p>
         )}
       </div>

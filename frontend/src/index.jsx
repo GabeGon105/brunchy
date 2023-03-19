@@ -17,6 +17,8 @@ import Profile from "./routes/Profile";
 import Logout from "./routes/Logout";
 import Feed from "./routes/Feed";
 import Post from "./routes/Post";
+import Saved from "./routes/Saved";
+import Search from "./routes/Search";
 
 const router = createBrowserRouter([
   {
@@ -51,6 +53,14 @@ const router = createBrowserRouter([
       {
         path: "/post/:id",
         element: <Post />,
+      },
+      {
+        path: "/saved",
+        element: <Saved />,
+      },
+      {
+        path: "/search",
+        element: <Search />,
       },
     ],
   },

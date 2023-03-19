@@ -46,7 +46,7 @@ export default function Index() {
             <Link to="/">Brunchy</Link>
           </h1>
           <p className="py-6 text-neutral">
-            Explore your city through breakfasts, bakeries, and brunches with
+            Explore your city through brunches, breakfasts, and bakeries with
             Brunchy!
           </p>
         </div>

@@ -8,8 +8,27 @@ module.exports = {
   getProfile: async (req, res) => {
     try {
       const posts = await Post.find({ user: req.params.id }).populate('likes').lean();
+      const everyPost = await Post.find();
+      const everyPostId = everyPost.map( (post) => post._id );
       const profileUser = await User.findById( req.params.id )
-      res.json({posts, profileUser});
+      
+      // Map through profileUser.followers and find the userObj for each follower id
+      const followersUsersArrPromise = profileUser.followers.map( async (follower) => {
+        const followUser = await User.findById( follower );
+        return [followUser._id, followUser.userName, followUser.image, followUser.bio.slice(0, 30)];
+      } )
+      // Await all the followersUsersArrPromise functions in Promise.all
+      const followersUsersArr = await Promise.all(followersUsersArrPromise);
+
+      // Map through profileUser.following and find the userObj for each following id
+      const followingUsersArrPromise = profileUser.following.map( async (following) => {
+        const followUser = await User.findById( following );
+        return [followUser._id, followUser.userName, followUser.image, followUser.bio.slice(0, 30)];
+      } )
+      // Await all the followingUsersArrPromise functions in Promise.all
+      const followingUsersArr = await Promise.all(followingUsersArrPromise);
+
+      res.json({posts, profileUser, followersUsersArr, followingUsersArr, everyPostId });
     } catch (err) {
       console.log(err);
     }
@@ -26,7 +45,54 @@ module.exports = {
   getFeed: async (req, res) => {
     try {
       const posts = await Post.find().sort({ createdAt: "desc" }).populate('likes').lean();
-      res.json(posts);
+      const everyPostId = posts.map( (post) => post._id );
+      res.json({posts, everyPostId});
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  getSearch: async (req, res) => {
+    try {
+      const allPosts = await Post.find().sort({ createdAt: "desc" }).populate('likes').populate({
+        path: 'comments',
+        populate: { path: 'userId' }
+      }).lean();
+      
+      const searchText = req.params.searchText.toLowerCase();
+      // filter only posts that contain the search text in the title, description, or in any comments
+      const posts = allPosts.filter( post => {
+        return post.title.toLowerCase().includes(searchText)
+        || post.caption.toLowerCase().includes(searchText)
+        || post.comments.some( comment => comment.text.toLowerCase().includes(searchText) )
+      } )
+
+      // const comments = post.toObject().comments
+
+      const everyPostId = allPosts.map( (post) => post._id );
+      res.json({posts, everyPostId});
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  getSaved: async (req, res) => {
+    try {
+      const savedPostIds = await req.user.postsSaved;
+
+      // find all saved posts by their id
+      const savedPostsPromise = savedPostIds.map( async (postId) => {
+        const post = await Post.findById(postId).populate('likes').lean();
+        return post;
+      })
+
+      // await all the find post by Id functions in promise.all, exactly where the magic happens
+      const savedPostsUnfiltered = await Promise.all(savedPostsPromise)
+
+      // filter out the posts that no longer exist and return null
+      const savedPosts = savedPostsUnfiltered.filter( (post) => post)
+
+      const everyPost = await Post.find();
+      const everyPostId = everyPost.map( (post) => post._id );
+      res.json({savedPosts, everyPostId});
     } catch (err) {
       console.log(err);
     }
@@ -37,6 +103,8 @@ module.exports = {
         path: 'comments',
         populate: { path: 'userId' }
       })
+      const everyPost = await Post.find();
+      const everyPostId = everyPost.map( (post) => post._id );
       // find the user of the user who created this post
       const postUser = await User.findById(post.user);
 
@@ -60,7 +128,7 @@ module.exports = {
 
       const comments = post.toObject().comments
 
-      res.json({ post: post.toObject() || null, comments: comments, like, save, postUserId: postUser._id, postUserName: postUser.userName , likesUsersArr: likesUsersArr});
+      res.json({ post: post.toObject() || null, comments: comments, like, save, postUserId: postUser._id, postUserName: postUser.userName , likesUsersArr: likesUsersArr, everyPostId});
     } catch (err) {
       console.log(err);
     }
@@ -100,6 +168,7 @@ module.exports = {
         image: imageResponses.map( upload => upload[0]),
         naverLink: req.body.naverLink,
         cloudinaryId: imageResponses.map( upload => upload[1]),
+        type: req.body.type,
         caption: req.body.caption,
         user: req.user.id,
       });

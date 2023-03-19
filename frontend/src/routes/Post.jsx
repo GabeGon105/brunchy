@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import { API_BASE } from "../constants";
 import Comment from "../components/Comment";
+import UsersList from "../components/UsersList";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ImageCarousel from "../components/ImageCarousel";
@@ -17,7 +18,7 @@ import likeColor from "../images/like-color.png";
 import likeNoColor from "../images/like-no-color.png";
 
 export default function Post() {
-  const { user } = useOutletContext();
+  const { user, setEveryPostId } = useOutletContext();
   const postId = useParams().id;
   const navigate = useNavigate();
 
@@ -62,6 +63,7 @@ export default function Post() {
           postUserId,
           postUserName,
           likesUsersArr,
+          everyPostId,
         }) => {
           // use the post.createdAt property to calculate the current date and assign this value to post.date
           const dateArray = new Date(post.createdAt).toString().split(" ");
@@ -69,6 +71,7 @@ export default function Post() {
           post.date = date;
 
           setPost(post);
+          setEveryPostId(everyPostId);
           setComments(comments);
           // if the post has been liked by the current user like will exist, else it will not exist and like will be false
           setLike(like.length > 0);
@@ -78,15 +81,28 @@ export default function Post() {
           setLikesUsersArr(likesUsersArr);
           setPostUserName(postUserName);
           setCheckedState([
-            post.type.includes("brunch"),
-            post.type.includes("breakfast"),
-            post.type.includes("bakery"),
+            post.type.includes("Brunch"),
+            post.type.includes("Breakfast"),
+            post.type.includes("Bakery"),
           ]);
         }
       );
   }, [setPost, postId]);
 
-  if (!user) return null;
+  if (!user)
+    return (
+      <div className="flex flex-col items-center">
+        <h1 className="text-neutral text-center text-xl mt-8">
+          Whoa there, fella...
+        </h1>
+        <p className="text-neutral text-center">
+          Head back to the login page, quick!
+        </p>
+        <Link to="/" className="btn btn-primary shadow-md w-52 mt-4">
+          Login Page
+        </Link>
+      </div>
+    );
 
   if (post === undefined) return null;
   else if (post === null) return <h2>Post not found</h2>;
@@ -124,7 +140,6 @@ export default function Post() {
   const handleDelete = async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
-    console.log(form);
     const response = await fetch(API_BASE + form.getAttribute("action"), {
       method: form.method,
       credentials: "include",
@@ -135,7 +150,7 @@ export default function Post() {
       // React toastify success message
       json.messages.success.map((el) => toast.success(el.msg));
     }
-    navigate(-1);
+    navigate(`/profile/${user._id}`);
   };
 
   const handleEdit = async (event) => {
@@ -149,20 +164,20 @@ export default function Post() {
 
     const json = await response.json();
 
-    // If there is a success message after deleting a comment, send a toastify success alert
+    // If there is a success message after editing a post, send a toastify success alert
     if (json.messages) {
       json.messages.success.map((el) => toast.success(el.msg));
     }
 
-    // Spread out the previos post state, update the title, naverLink, and caption, then setPost
+    // Spread out the previous post state, update the title, naverLink, and caption, then setPost
     setPost({
       ...post,
       title: json.updatedPost.title,
       naverLink: json.updatedPost.naverLink,
       caption: json.updatedPost.caption,
       type: json.updatedPost.type,
+      edited: json.updatedPost.edited,
     });
-    console.log(post);
     form.reset();
   };
 
@@ -222,9 +237,9 @@ export default function Post() {
   };
 
   const postTypeBadgeDictionary = {
-    brunch: "primary",
-    breakfast: "secondary",
-    bakery: "accent",
+    Brunch: "primary",
+    Breakfast: "secondary",
+    Bakery: "accent",
   };
 
   return (
@@ -237,7 +252,7 @@ export default function Post() {
             <h2 className="text-2xl md:text-3xl font-semibold text-neutral break-words self-center md:w-3/4">
               {post.title}
             </h2>
-            {/* If the post user's id matches the current user, allow the user to edit the comment */}
+            {/* If the post user's id matches the current user, allow the user to edit the post */}
             <div className="">
               {post.user === user._id ? (
                 <>
@@ -359,13 +374,13 @@ export default function Post() {
                                         className="label text-cyan-500 cursor-pointer font-semibold"
                                         htmlFor="brunch"
                                       >
-                                        brunch
+                                        Brunch
                                         <input
                                           type="checkbox"
                                           className="checkbox checkbox-primary"
                                           id="brunch"
                                           name="type"
-                                          value="brunch"
+                                          value="Brunch"
                                           checked={checkedState[0]}
                                           onChange={() =>
                                             handlePostTypeChange(0)
@@ -378,13 +393,13 @@ export default function Post() {
                                         className="label text-rose-300 cursor-pointer font-semibold"
                                         htmlFor="breakfast"
                                       >
-                                        breakfast
+                                        Breakfast
                                         <input
                                           type="checkbox"
                                           className="checkbox checkbox-secondary"
                                           id="breakfast"
                                           name="type"
-                                          value="breakfast"
+                                          value="Breakfast"
                                           checked={checkedState[1]}
                                           onChange={() =>
                                             handlePostTypeChange(1)
@@ -397,13 +412,13 @@ export default function Post() {
                                         className="label text-accent cursor-pointer font-semibold"
                                         htmlFor="bakery"
                                       >
-                                        bakery
+                                        Bakery
                                         <input
                                           type="checkbox"
                                           className="checkbox checkbox-accent"
                                           id="bakery"
                                           name="type"
-                                          value="bakery"
+                                          value="Bakery"
                                           checked={checkedState[2]}
                                           onChange={() =>
                                             handlePostTypeChange(2)
@@ -490,7 +505,7 @@ export default function Post() {
             key={post._id}
             images={post.image}
             caption={post.caption}
-            className=""
+            className="max-h-96"
           />
         </div>
         {/* Like and Save post buttons */}
@@ -532,7 +547,7 @@ export default function Post() {
             {/* The button to open users likes modal */}
             <label
               htmlFor={`modal-${post.id}-likes`}
-              className="text-neutral hover:text-cyan-500"
+              className="text-neutral hover:text-cyan-500 cursor-pointer"
             >
               {/* if number of likes is greater than 1 display likes plural, else display singular */}
               {post.likes !== 1
@@ -557,45 +572,7 @@ export default function Post() {
                       ? `${likesUsersArr.length} Like`
                       : `${likesUsersArr.length} Likes`}
                   </h3>
-                  <ul
-                    className="flex flex-col items-center"
-                    role="group"
-                    aria-label="User Likes"
-                  >
-                    {likesUsersArr.map((user, i) => {
-                      return (
-                        <li
-                          key={user[0]}
-                          className={`flex flex-col items-center w-full py-2 ${
-                            i % 2 === 0 ? "" : "bg-base-200"
-                          }`}
-                        >
-                          <div className="flex items-center space-x-3 w-80">
-                            <div className="avatar">
-                              <div className="w-12 rounded-full hover:opacity-50">
-                                <Link to={`/profile/${user[0]}`}>
-                                  <img
-                                    src={user[2]}
-                                    alt={`User photo of ${user[1]}`}
-                                  />
-                                </Link>
-                              </div>
-                            </div>
-                            <div>
-                              <Link to={`/profile/${user[0]}`}>
-                                <span className="text-neutral font-bold hover:text-cyan-500">
-                                  {user[1]}
-                                </span>
-                              </Link>
-                              <div className="text-sm opacity-50">
-                                {user[3].slice(0, 30)}
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
+                  <UsersList usersArr={likesUsersArr} />
                   <div className="modal-action flex justify-center mt-3">
                     <label
                       htmlFor={`modal-${post.id}-likes`}

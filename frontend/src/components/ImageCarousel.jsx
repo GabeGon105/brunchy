@@ -29,7 +29,7 @@ const ImageCarousel = ({ images, caption }) => (
       return (
         <SwiperSlide key={i} className="w-1/2">
           {/* <div className="swiper-zoom-container"> */}
-          <img src={image} alt={caption} className="mx-auto" />
+          <img src={image} alt={caption} className="mx-auto max-h-96" />
           {/* </div> */}
         </SwiperSlide>
       );
