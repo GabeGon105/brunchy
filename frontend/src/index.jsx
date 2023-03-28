@@ -10,7 +10,6 @@ import "./style.css";
 import App from "./App";
 import Root from "./routes/Root";
 import ErrorPage from "./routes/ErrorPage";
-import Login from "./routes/Login";
 import Signup from "./routes/Signup";
 import Index from "./routes/Index";
 import Profile from "./routes/Profile";

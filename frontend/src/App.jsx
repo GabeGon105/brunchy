@@ -2,7 +2,7 @@ function App() {
   return (
     <main className="container">
       <div className="row justify-content-around mt-5">
-        <a href="/login" className="col-3 btn btn-primary">
+        <a href="/" className="col-3 btn btn-primary">
           {" "}
           Login
         </a>
