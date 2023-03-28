@@ -43,15 +43,6 @@ module.exports = {
       console.log(err);
     }
   },
-  // getProfileOther: async (req, res) => {
-  //   try {
-  //     console.log(req.params.id);
-  //     const posts = await Post.find({ user: req.params.id }).populate('likes').lean();
-  //     res.json(posts);
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // },
   getFeed: async (req, res) => {
     try {
       const posts = await Post.find().sort({ createdAt: "desc" }).populate('likes').lean();
@@ -140,23 +131,6 @@ module.exports = {
   },
   createPost: async (req, res) => {
     try {
-      // // Upload image to cloudinary
-      // const result = await cloudinary.uploader.upload(req.file.path);
-
-      // const post = await Post.create({
-      //   title: req.body.title,
-      //   image: result.secure_url,
-      //   naverLink: req.body.naverLink,
-      //   cloudinaryId: result.public_id,
-      //   caption: req.body.caption,
-      //   user: req.user.id,
-      // });
-      // console.log("Post has been added!");
-      // // send success message
-      // req.flash("success", { msg: "Post has been added!" });
-      // res.json({ post, messages: req.flash() });
-
-      
       const result = await req.files;
 
       // Upload images to cloudinary

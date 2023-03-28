@@ -94,24 +94,6 @@ export default function Profile() {
   if (profileUser === undefined) return null;
   else if (profileUser === null) return <h2>Profile not found</h2>;
 
-  // const handleFileChange = (e) => {
-  //   if (e.target.files.length > 5) {
-  //     e.target.value = "";
-  //     setImages([{ preview: "", data: "" }]);
-  //     toast.warning("Please only upload up to a maximum of 5 photos");
-  //   } else if (e.target.files.length > 0) {
-  //     const images = Object.values(e.target.files).map((image) => {
-  //       return {
-  //         preview: URL.createObjectURL(image),
-  //         data: image,
-  //       };
-  //     });
-  //     setImages(images);
-  //   } else {
-  //     setImages([{ preview: "", data: "" }]);
-  //   }
-  // };
-
   const handleFileChange = (e) => {
     if (e.target.files.length > 0 && uploadImages.files.length < 5) {
       const image = {
@@ -288,7 +270,6 @@ export default function Profile() {
                   ></img>
                 </label>
 
-                {/* Put this part before </body> tag */}
                 <input
                   type="checkbox"
                   id={`modal-${user.id}`}
@@ -420,7 +401,6 @@ export default function Profile() {
               followers
             </label>
 
-            {/* Put this part before </body> tag */}
             <input
               type="checkbox"
               id={`modal-${user._id}-followers`}
@@ -465,7 +445,6 @@ export default function Profile() {
               following
             </label>
 
-            {/* Put this part before </body> tag */}
             <input
               type="checkbox"
               id={`modal-${user._id}-following`}
@@ -666,10 +645,6 @@ export default function Profile() {
                             Upload Preview
                           </span>
                           <div className="grid w-full place-items-center">
-                            {/* <img
-                              src={image.preview}
-                              className="w-80 ring ring-secondary"
-                            /> */}
                             {/* Image Carousel with post image previews */}
                             <ImageCarousel
                               key={`${user._id}-post-preview`}
@@ -742,27 +717,6 @@ export default function Profile() {
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         )}
       />
-
-      {/* <div className="row mt-5">
-        <div className="col-6">
-          <div>
-            <Link to="/logout" className="col-3 btn btn-primary">
-              Logout
-            </Link>
-          </div>
-          <div className="mt-5">
-          </div>
-        </div>
-
-        <div className="col-6">
-          <PostList posts={posts} />
-          <div className="row justify-content-center mt-5">
-            <Link className="btn btn-primary" to="/feed">
-              Return to Feed
-            </Link>
-          </div>
-        </div>
-      </div> */}
     </div>
   );
 }

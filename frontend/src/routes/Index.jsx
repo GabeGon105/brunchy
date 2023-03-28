@@ -23,12 +23,10 @@ export default function Index() {
     });
     const json = await response.json();
     if (json.messages.errors) {
-      // setMessages(json.messages);
       // React toastify errors message
       json.messages.errors.map((el) => toast.error(el.msg));
     }
     if (json.messages.success) {
-      // setMessages(json.messages);
       // React toastify success message
       json.messages.success.map((el) => toast.success(el.msg));
     }
@@ -98,11 +96,6 @@ export default function Index() {
           </div>
         </div>
       </div>
-
-      {/* <div className="row justify-content-around mt-5">
-			<Link to="/login" className="col-3 btn btn-primary"> Login</Link>
-			<Link to="/signup" className="col-3 btn btn-primary"> Signup</Link>
-		</div> */}
     </main>
   );
 }

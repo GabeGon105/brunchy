@@ -280,7 +280,6 @@ export default function Post() {
                     ></img>
                   </label>
 
-                  {/* Put this part before </body> tag */}
                   <input
                     type="checkbox"
                     id={`modal-${post.id}`}
@@ -575,7 +574,6 @@ export default function Post() {
                 : `${post.likes} person likes this`}
             </label>
 
-            {/* Put this part before </body> tag */}
             <input
               type="checkbox"
               id={`modal-${post.id}-likes`}

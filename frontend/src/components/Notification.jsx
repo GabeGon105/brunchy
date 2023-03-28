@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { Link } from "react-router-dom";
 
-const Notification = ({ notification, index, handleRead, handleDelete }) => {
+const Notification = ({ notification, handleRead, handleDelete }) => {
   const messageDictionary = {
     follow: " started following you!",
     like: " liked your post!",
@@ -106,26 +106,3 @@ const Notification = ({ notification, index, handleRead, handleDelete }) => {
 };
 
 export default Notification;
-
-// import Notification from "./Notification";
-
-// const NotificationsList = ({ notifications, handleRead }) => (
-//   <ul
-//     className="flex flex-col items-center"
-//     role="group"
-//     aria-label="Notification List"
-//   >
-//     {notifications.map((currentNotification, index) => {
-//       return (
-//         <Notification
-//           key={`notification-${currentNotification._id}`}
-//           notification={currentNotification}
-//           handleRead={handleRead}
-//           index={index}
-//         />
-//       );
-//     })}
-//   </ul>
-// );
-
-// export default NotificationsList;

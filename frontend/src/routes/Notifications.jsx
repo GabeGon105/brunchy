@@ -123,51 +123,6 @@ export default function Notifications() {
     );
   };
 
-  // if (user.notifications !== []) {
-  //   // Set visible notifications to only the most recent comment per post, the most recent like per post, and every follow
-  //   const notificationsSortedByDate = user.notifications.sort(
-  //     (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-  //   );
-
-  //   const followNotifications = notificationsSortedByDate.filter(
-  //     (notification) => notification.type === "follow"
-  //   );
-  //   const followNotificationsUniquePost = [
-  //     ...new Map(
-  //       followNotifications.map((item) => [item["user"], item])
-  //     ).values(),
-  //   ];
-
-  //   const likeNotifications = notificationsSortedByDate.filter(
-  //     (notification) => notification.type === "like"
-  //   );
-  //   const likeNotificationsUniquePost = [
-  //     ...new Map(
-  //       likeNotifications.map((item) => [item["postId"], item])
-  //     ).values(),
-  //   ];
-
-  //   const commentNotifications = notificationsSortedByDate.filter(
-  //     (notification) => notification.type === "comment"
-  //   );
-  //   const commentNotificationsUniquePost = [
-  //     ...new Map(
-  //       commentNotifications.map((item) => [item["postId"], item])
-  //     ).values(),
-  //   ];
-
-  //   const notifications = followNotificationsUniquePost
-  //     .concat(likeNotificationsUniquePost, commentNotificationsUniquePost)
-  //     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-  //   // for each notification, use the notification.createdAt property to calculate the current date and assign this value to notification.date
-  //   notifications.forEach((notification) => {
-  //     const dateArray = new Date(notification.createdAt).toString().split(" ");
-  //     const date = `${dateArray[2]} ${dateArray[1]}, ${dateArray[3]}`;
-  //     notification.date = date;
-  //   });
-  // }
-
   return (
     <div className="container w-full md:w-5/6 xl:w-2/3 mx-auto mt-4">
       <div className="flex mb-2">

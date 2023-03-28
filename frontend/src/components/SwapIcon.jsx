@@ -3,9 +3,6 @@ const SwapIcon = ({ filter, swapOn, swapOff, click }) => (
     className={`swap swap-rotate ${filter ? "swap-active" : ""}`}
     onClick={click}
   >
-    {/* this hidden checkbox controls the state */}
-    {/* <input type="checkbox" /> */}
-
     {/* On Icon */}
     {swapOn}
 

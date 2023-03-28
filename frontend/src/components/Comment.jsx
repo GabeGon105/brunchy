@@ -54,7 +54,6 @@ export default function Comment({
                 ...
               </label>
 
-              {/* Put this part before </body> tag */}
               <input
                 type="checkbox"
                 id={`modal-${comment._id}`}
@@ -106,12 +105,6 @@ export default function Comment({
                             id={`editComment-${comment._id}-formCollapse`}
                           >
                             <div className="mt-2 rounded-lg bg-base-100 my-3 flex flex-col items-center">
-                              {/* <p className="w-3/4 text-center text-neutral font-semibold">
-                              Previous comment:{" "}
-                              <span className="text-neutral font-normal">
-                                {comment.text}
-                              </span>
-                            </p> */}
                               {/* Edit comment upload form */}
                               <form
                                 action={`/api/comment/editComment/${postId}/${comment._id}?_method=PATCH`}

@@ -6,7 +6,7 @@ import brunchy from "../images/brunchy-color.png";
 import { toast } from "react-toastify";
 
 export default function Signup() {
-  const { user, setUser, setMessages } = useOutletContext();
+  const { user, setUser } = useOutletContext();
   const [userNameInput, setUserNameInput] = useState("");
   const navigate = useNavigate();
 
@@ -25,12 +25,10 @@ export default function Signup() {
     });
     const json = await response.json();
     if (json.messages.errors) {
-      // setMessages(json.messages);
       // React toastify errors messages
       json.messages.errors.map((el) => toast.error(el.msg));
     }
     if (json.messages.success) {
-      // setMessages(json.messages);
       // React toastify success message
       json.messages.success.map((el) => toast.success(el.msg));
     }
