@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
-import "flowbite";
 import "../style.css";
 import Messages from "../components/Messages";
 import { API_BASE } from "../constants";
