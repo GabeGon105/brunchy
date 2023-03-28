@@ -2,20 +2,19 @@ const cloudinary = require("../middleware/cloudinary");
 const Post = require("../models/Post");
 const Comment = require("../models/Comment");
 const Like = require("../models/Like");
-const User = require("../models/User")
+const User = require("../models/User");
+const Notification = require("../models/Notification")
 
 module.exports = {
   getProfile: async (req, res) => {
     try {
       const posts = await Post.find({ user: req.params.id }).populate('likes').lean();
-      const everyPost = await Post.find();
-      const everyPostId = everyPost.map( (post) => post._id );
       const profileUser = await User.findById( req.params.id )
       
       // Map through profileUser.followers and find the userObj for each follower id
       const followersUsersArrPromise = profileUser.followers.map( async (follower) => {
         const followUser = await User.findById( follower );
-        return [followUser._id, followUser.userName, followUser.image, followUser.bio.slice(0, 30)];
+        return [followUser._id, followUser.userName, followUser.image, followUser.bio];
       } )
       // Await all the followersUsersArrPromise functions in Promise.all
       const followersUsersArr = await Promise.all(followersUsersArrPromise);
@@ -23,12 +22,23 @@ module.exports = {
       // Map through profileUser.following and find the userObj for each following id
       const followingUsersArrPromise = profileUser.following.map( async (following) => {
         const followUser = await User.findById( following );
-        return [followUser._id, followUser.userName, followUser.image, followUser.bio.slice(0, 30)];
+        return [followUser._id, followUser.userName, followUser.image, followUser.bio];
       } )
       // Await all the followingUsersArrPromise functions in Promise.all
       const followingUsersArr = await Promise.all(followingUsersArrPromise);
 
-      res.json({posts, profileUser, followersUsersArr, followingUsersArr, everyPostId });
+      const user = await User.findById(req.user.id);
+
+      // Map through user.notifications and find the notification Obj for each id
+      const notificationsArrPromise = user.notifications.map( async (id) => {
+        const notification = await Notification.findById( id );
+        return notification;
+      } )
+
+      // Await all the notificationPromise functions in Promise.all
+      const notifications = await Promise.all(notificationsArrPromise);
+
+      res.json({posts, profileUser, followersUsersArr, followingUsersArr, notifications });
     } catch (err) {
       console.log(err);
     }
@@ -45,8 +55,7 @@ module.exports = {
   getFeed: async (req, res) => {
     try {
       const posts = await Post.find().sort({ createdAt: "desc" }).populate('likes').lean();
-      const everyPostId = posts.map( (post) => post._id );
-      res.json({posts, everyPostId});
+      res.json({posts});
     } catch (err) {
       console.log(err);
     }
@@ -66,10 +75,8 @@ module.exports = {
         || post.comments.some( comment => comment.text.toLowerCase().includes(searchText) )
       } )
 
-      // const comments = post.toObject().comments
-
-      const everyPostId = allPosts.map( (post) => post._id );
-      res.json({posts, everyPostId});
+      
+      res.json({posts});
     } catch (err) {
       console.log(err);
     }
@@ -90,9 +97,8 @@ module.exports = {
       // filter out the posts that no longer exist and return null
       const savedPosts = savedPostsUnfiltered.filter( (post) => post)
 
-      const everyPost = await Post.find();
-      const everyPostId = everyPost.map( (post) => post._id );
-      res.json({savedPosts, everyPostId});
+      
+      res.json({savedPosts});
     } catch (err) {
       console.log(err);
     }
@@ -103,8 +109,7 @@ module.exports = {
         path: 'comments',
         populate: { path: 'userId' }
       })
-      const everyPost = await Post.find();
-      const everyPostId = everyPost.map( (post) => post._id );
+      
       // find the user of the user who created this post
       const postUser = await User.findById(post.user);
 
@@ -128,7 +133,7 @@ module.exports = {
 
       const comments = post.toObject().comments
 
-      res.json({ post: post.toObject() || null, comments: comments, like, save, postUserId: postUser._id, postUserName: postUser.userName , likesUsersArr: likesUsersArr, everyPostId});
+      res.json({ post: post.toObject() || null, comments: comments, like, save, postUser , likesUsersArr: likesUsersArr});
     } catch (err) {
       console.log(err);
     }
@@ -193,6 +198,46 @@ module.exports = {
         await Like.create(obj);
         console.log("Likes +1");
         change = 1
+
+        // find the post user
+        const post = await Post.findById(req.params.id);
+        const postUser = await User.findById(post.user);
+
+        // if the current user is not the post user...
+        // splice older like notifications for this post id from the user notifications array,
+        // delete older like notifications for this post id,
+        // create a new like notification object,
+        // then unshift the new notification id to the post user's notifications array
+        if (req.user.id != post.user) {
+          // If an existing like notification with type 'like' and this post id exists, delete it
+          const notificationObj = { type: 'like', postId: req.params.id }
+          const currentNotification = await Notification.find(notificationObj);
+          if ( currentNotification[0] ) {
+            // find the index of the current notification in the user.notifications array, then splice it out of the array
+            const index = postUser.notifications.indexOf(currentNotification[0]._id);
+            postUser.notifications.splice(index, 1);
+            await postUser.save();
+            await Notification.deleteOne(notificationObj);
+            console.log(`Deleted previous like notification for postId ${req.params.id}.`);
+          }
+
+          // Create a new like notification
+          const newNotification = await Notification.create({
+            type: 'like',
+            forUser: post.user,
+            user: req.user.id,
+            userName: req.user.userName,
+            userImage: req.user.image,
+            postId: req.params.id,
+            postImage: post.image[0],
+            read: false,
+          })
+          console.log(`New like notification created for ${postUser.userName}.`)
+          
+          // push newNotification._id to postUser's notifications array
+          await postUser.notifications.unshift(newNotification._id);
+          await postUser.save();
+        }
       }
 
       // Find all likes on this post and assign to a variable

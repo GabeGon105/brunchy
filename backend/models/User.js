@@ -27,6 +27,7 @@ const UserSchema = new mongoose.Schema({
   following: Array,
   postsLiked: Array,
   postsSaved: Array,
+  notifications: Array,
   createdAt: {
     type: Date,
     default: Date.now,

@@ -18,7 +18,7 @@ import likeColor from "../images/like-color.png";
 import likeNoColor from "../images/like-no-color.png";
 
 export default function Post() {
-  const { user, setEveryPostId } = useOutletContext();
+  const { user } = useOutletContext();
   const postId = useParams().id;
   const navigate = useNavigate();
 
@@ -26,10 +26,25 @@ export default function Post() {
   const [comments, setComments] = useState([]);
   const [like, setLike] = useState();
   const [save, setSave] = useState();
-  const [postUserId, setPostUserId] = useState();
-  const [postUserName, setPostUserName] = useState();
+  const [postUser, setPostUser] = useState();
   const [likesUsersArr, setLikesUsersArr] = useState([]);
   const [checkedState, setCheckedState] = useState(new Array(3).fill(false));
+  const [likeButtonDisabled, setLikeButtonDisabled] = useState(false);
+  const [saveButtonDisabled, setSaveButtonDisabled] = useState(false);
+  const [mapsLinkText, setMapsLinkText] = useState("");
+
+  const likeButtonClick = () => {
+    setLikeButtonDisabled(true);
+    setTimeout(() => {
+      setLikeButtonDisabled(false);
+    }, 500);
+  };
+  const saveButtonClick = () => {
+    setSaveButtonDisabled(true);
+    setTimeout(() => {
+      setSaveButtonDisabled(false);
+    }, 500);
+  };
 
   const handlePostTypeChange = (position) => {
     const updatedCheckedState = checkedState.map((item, index) =>
@@ -54,39 +69,29 @@ export default function Post() {
   useEffect(() => {
     fetch(API_BASE + `/api/post/${postId}`, { credentials: "include" })
       .then((res) => res.json())
-      .then(
-        ({
-          post,
-          comments,
-          like,
-          save,
-          postUserId,
-          postUserName,
-          likesUsersArr,
-          everyPostId,
-        }) => {
-          // use the post.createdAt property to calculate the current date and assign this value to post.date
-          const dateArray = new Date(post.createdAt).toString().split(" ");
-          const date = `${dateArray[2]} ${dateArray[1]}, ${dateArray[3]}`;
-          post.date = date;
+      .then(({ post, comments, like, save, postUser, likesUsersArr }) => {
+        // use the post.createdAt property to calculate the current date and assign this value to post.date
+        const dateArray = new Date(post.createdAt).toString().split(" ");
+        const date = `${dateArray[2]} ${dateArray[1]}, ${dateArray[3]}`;
+        post.date = date;
 
-          setPost(post);
-          setEveryPostId(everyPostId);
-          setComments(comments);
-          // if the post has been liked by the current user like will exist, else it will not exist and like will be false
-          setLike(like.length > 0);
-          // if the post has been saved by the current user save will exist, else it will not exist and save will be false
-          setSave(save.length > 0);
-          setPostUserId(postUserId);
-          setLikesUsersArr(likesUsersArr);
-          setPostUserName(postUserName);
-          setCheckedState([
-            post.type.includes("Brunch"),
-            post.type.includes("Breakfast"),
-            post.type.includes("Bakery"),
-          ]);
-        }
-      );
+        setPost(post);
+        setComments(comments);
+        // if the post has been liked by the current user like will exist, else it will not exist and like will be false
+        setLike(like.length > 0);
+        // if the post has been saved by the current user save will exist, else it will not exist and save will be false
+        setSave(save.length > 0);
+        setPostUser(postUser);
+        setLikesUsersArr(likesUsersArr);
+        setMapsLinkText(post.naverLink);
+        setCheckedState([
+          post.type.includes("Brunch"),
+          post.type.includes("Breakfast"),
+          post.type.includes("Bakery"),
+        ]);
+
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      });
   }, [setPost, postId]);
 
   if (!user)
@@ -108,6 +113,7 @@ export default function Post() {
   else if (post === null) return <h2>Post not found</h2>;
 
   const handleLike = async (event) => {
+    likeButtonClick();
     event.preventDefault();
     const form = event.currentTarget;
     const response = await fetch(API_BASE + form.getAttribute("action"), {
@@ -123,6 +129,7 @@ export default function Post() {
   };
 
   const handleSave = async (event) => {
+    saveButtonClick();
     event.preventDefault();
     const form = event.currentTarget;
     const response = await fetch(API_BASE + form.getAttribute("action"), {
@@ -242,6 +249,11 @@ export default function Post() {
     Bakery: "accent",
   };
 
+  const handleMapsLinkTextChange = (e) => {
+    const mapsLinkTextArr = e.target.value.split(" ");
+    setMapsLinkText(mapsLinkTextArr[mapsLinkTextArr.length - 1]);
+  };
+
   return (
     <div className="container">
       <div className="row justify-content-center mt-3 sm:w-5/6 md:w-3/4 lg:w-2/3 xl-1/2 mx-auto">
@@ -343,22 +355,22 @@ export default function Post() {
                                       name="title"
                                     />
                                   </div>
-                                  {/* Naver Maps link edit */}
+                                  {/* Naver/Kakao Maps link edit */}
                                   <div className="w-3/4 md:flex md:flex-col mb-3">
                                     <label
                                       className="label text-neutral"
                                       htmlFor="naverLink"
                                     >
-                                      Naver Maps link:
+                                      Naver/Kakao Maps link:
                                     </label>
                                     <input
                                       type="text"
                                       required
-                                      maxLength="100"
-                                      defaultValue={post.naverLink}
+                                      value={mapsLinkText}
                                       className="input input-bordered input-primary w-full"
                                       id="naverLink"
                                       name="naverLink"
+                                      onChange={handleMapsLinkTextChange}
                                     />
                                   </div>
                                   {/* Breakfast, Brunch, Bakery type edit */}
@@ -516,7 +528,11 @@ export default function Post() {
             method="POST"
             onSubmit={handleLike}
           >
-            <button className="w-20 btn btn-ghost" type="submit">
+            <button
+              className="w-20 btn btn-ghost"
+              type="submit"
+              disabled={likeButtonDisabled}
+            >
               {/* If the photo is liked by the current user, display a color photo, else display a colorless photo */}
               <img
                 src={like ? likeColor : likeNoColor}
@@ -532,7 +548,11 @@ export default function Post() {
             method="POST"
             onSubmit={handleSave}
           >
-            <button className="w-20 btn btn-ghost" type="submit">
+            <button
+              className="w-20 btn btn-ghost"
+              type="submit"
+              disabled={saveButtonDisabled}
+            >
               <img
                 src={save ? savedColor : savedNoColor}
                 className="w-10"
@@ -547,7 +567,7 @@ export default function Post() {
             {/* The button to open users likes modal */}
             <label
               htmlFor={`modal-${post.id}-likes`}
-              className="text-neutral hover:text-cyan-500 cursor-pointer"
+              className="text-neutral hover:text-cyan-500 cursor-pointer underline"
             >
               {/* if number of likes is greater than 1 display likes plural, else display singular */}
               {post.likes !== 1
@@ -588,14 +608,28 @@ export default function Post() {
 
           {/* Likes, username, and post caption */}
           <div className="flex flex-col mt-2">
-            <p className="text-neutral break-words whitespace-pre-line">
-              <Link to={`/profile/${postUserId}`}>
-                <span className="text-neutral break-words font-bold mr-1 hover:text-cyan-500">
-                  {postUserName}
-                </span>
-              </Link>
+            <div className="text-neutral break-words whitespace-pre-line">
+              <div className="chat-image avatar float-left mr-2">
+                <div className="w-12 rounded-full">
+                  <Link to={`/profile/${postUser._id}`} className="h-12">
+                    <img
+                      src={postUser.image}
+                      alt="user profile photo"
+                      className="hover:opacity-50"
+                    />
+                  </Link>
+                </div>
+              </div>
+              <span className="text-neutral break-words font-bold mr-1">
+                <Link
+                  to={`/profile/${postUser._id}`}
+                  className="hover:text-cyan-500"
+                >
+                  {postUser.userName}
+                </Link>
+              </span>
               {post.caption}
-            </p>
+            </div>
             <div className="mt-2">
               <span className="text-neutral text-sm mr-1">{post.date}</span>
               {post.edited && (
@@ -603,8 +637,9 @@ export default function Post() {
               )}
             </div>
           </div>
+          <div className="divider"></div>
           {/* Comment count and comments */}
-          <div className="my-4">
+          <div className="mb-4">
             <p
               className={`text-neutral ${comments.length < 1 ? "hidden" : ""}`}
             >
@@ -618,10 +653,9 @@ export default function Post() {
                 <Comment
                   key={comment._id}
                   comment={comment}
-                  depth={0}
                   postId={post._id}
                   currentUserId={user._id}
-                  postUserId={postUserId}
+                  postUserId={postUser._id}
                   deleteComment={deleteComment}
                   updateComment={updateComment}
                 />

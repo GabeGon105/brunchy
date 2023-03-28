@@ -8,6 +8,11 @@ export default function Index() {
   const { user, setUser, setMessages } = useOutletContext();
   const navigate = useNavigate();
 
+  if (user) {
+    navigate(`/profile/${user._id}`);
+    window.location.reload();
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
@@ -30,6 +35,7 @@ export default function Index() {
     if (json.user) {
       setUser(json.user);
       navigate(`/profile/${json.user._id}`);
+      window.location.reload();
     }
   };
 

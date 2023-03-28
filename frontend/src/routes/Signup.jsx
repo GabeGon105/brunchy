@@ -1,12 +1,19 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { API_BASE } from "../constants";
 import brunchy from "../images/brunchy-color.png";
 import { toast } from "react-toastify";
 
 export default function Signup() {
-  const { setUser, setMessages } = useOutletContext();
+  const { user, setUser, setMessages } = useOutletContext();
+  const [userNameInput, setUserNameInput] = useState("");
   const navigate = useNavigate();
+
+  if (user) {
+    navigate(`/profile/${user._id}`);
+    window.location.reload();
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -31,6 +38,11 @@ export default function Signup() {
       setUser(json.user);
       navigate(`/profile/${json.user._id}`);
     }
+  };
+
+  const handleUserNameInputChange = (e) => {
+    const onlyLetters = e.target.value.replace(/[^a-z]/gi, "");
+    setUserNameInput(onlyLetters);
   };
 
   return (
@@ -67,9 +79,11 @@ export default function Signup() {
                   name="userName"
                   type="text"
                   required
+                  value={userNameInput}
                   maxLength="30"
                   placeholder="Username"
                   className="input input-bordered drop-shadow-md text-neutral"
+                  onChange={handleUserNameInputChange}
                 />
               </div>
               <div className="form-control border-0 bg-base-100">

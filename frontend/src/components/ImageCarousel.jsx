@@ -16,7 +16,7 @@ const ImageCarousel = ({ images, caption }) => (
     pagination={{
       clickable: true,
     }}
-    // zoom={true}
+    zoom={true}
     navigation={true}
     modules={[Navigation, Pagination, Zoom]}
     className="mySwiper"
@@ -29,7 +29,7 @@ const ImageCarousel = ({ images, caption }) => (
       return (
         <SwiperSlide key={i} className="w-1/2">
           {/* <div className="swiper-zoom-container"> */}
-          <img src={image} alt={caption} className="mx-auto max-h-96" />
+          <img src={image} alt={caption} className="mx-auto min-w-60" />
           {/* </div> */}
         </SwiperSlide>
       );

@@ -6,7 +6,7 @@ import SwapIcon from "../components/SwapIcon";
 import { API_BASE } from "../constants";
 
 export default function Search() {
-  const { user, setEveryPostId } = useOutletContext();
+  const { user } = useOutletContext();
   const [posts, setPosts] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [filteredPosts, setFilteredPosts] = useState([]);
@@ -22,9 +22,8 @@ export default function Search() {
           credentials: "include",
         })
           .then((res) => res.json())
-          .then(({ posts, everyPostId }) => {
+          .then(({ posts }) => {
             setPosts(posts);
-            setEveryPostId(everyPostId);
             setFilteredPosts(posts);
           });
       }, 1000);
@@ -36,25 +35,20 @@ export default function Search() {
     // change brunchFilter to the opposite of it's previous state
     setBrunchFilter(!brunchFilter);
   };
-  useEffect(() => {
-    handlePostsFilter();
-  }, [brunchFilter]);
 
   const handleBreakfastFilter = () => {
     // change breakfastFilter to the opposite of it's previous state
     setBreakfastFilter(!breakfastFilter);
   };
-  useEffect(() => {
-    handlePostsFilter();
-  }, [breakfastFilter]);
 
   const handleBakeryFilter = () => {
     // change bakeryFilter to the opposite of it's previous state
     setBakeryFilter(!bakeryFilter);
   };
+
   useEffect(() => {
     handlePostsFilter();
-  }, [bakeryFilter]);
+  }, [brunchFilter, breakfastFilter, bakeryFilter, posts]);
 
   const handlePostsFilter = () => {
     let newFilteredPostsArray = [];
@@ -159,17 +153,17 @@ export default function Search() {
             click={handleBakeryFilter}
           />
         </div>
-        <PostList
-          posts={filteredPosts.sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          )}
-        />
         {filteredPosts.length === 0 && (
           <p className="text-neutral text-center mt-4">
             ? <br />
             ʕ•ᴥ•ʔ
           </p>
         )}
+        <PostList
+          posts={filteredPosts.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          )}
+        />
       </div>
     </div>
   );

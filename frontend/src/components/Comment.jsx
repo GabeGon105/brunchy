@@ -8,6 +8,11 @@ export default function Comment({
   updateComment,
   postUserId,
 }) {
+  // use the comment.createdAt property to calculate the current date and assign this value to comment.date
+  const dateArray = new Date(comment.createdAt).toString().split(" ");
+  const date = `${dateArray[2]} ${dateArray[1]}, ${dateArray[3]}`;
+  comment.date = date;
+
   // call a click event to close the Edit Comment drop-down, and call a click event to close the Edit/Delete comment modal when the Sumbit Edit Comment button is clicked
   const editCommentRef = useRef(null);
   const editDeleteCommentRef = useRef(null);
@@ -164,7 +169,10 @@ export default function Comment({
 
       {/* <div className="chat-footer opacity-50">Delivered</div> */}
       <div className="chat-footer text-xs">
-        {comment.edited ? "Edited" : null}
+        <span className="text-neutral text-xs">{comment.date}</span>
+        {comment.edited && (
+          <span className="text-neutral text-xs"> • Edited</span>
+        )}
       </div>
     </div>
   );

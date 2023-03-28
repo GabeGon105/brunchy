@@ -12,15 +12,25 @@ import brunchy from "../images/brunchy-color.png";
 import brunchyNoColor from "../images/brunchy.png";
 
 export default function Profile() {
-  const { user, setUser, setEveryPostId } = useOutletContext();
+  const { user, setUser } = useOutletContext();
   const [profileUser, setProfileUser] = useState();
   const profileId = useParams().id;
-  const [images, setImages] = useState([{ preview: "", data: "" }]);
+  const [images, setImages] = useState({ files: [] });
+  const [uploadImages, setUploadImages] = useState({ files: [] });
   const [imageEdit, setImageEdit] = useState({ preview: "", data: "" });
   const [posts, setPosts] = useState([]);
   const [followersUsersArr, setFollowersUsersArr] = useState([]);
   const [followingUsersArr, setFollowingUsersArr] = useState([]);
   const [checkedState, setCheckedState] = useState(new Array(3).fill(false));
+  const [followButtonDisabled, setfollowButtonDisabled] = useState(false);
+  const [mapsLinkText, setMapsLinkText] = useState("");
+
+  const followButtonClick = () => {
+    setfollowButtonDisabled(true);
+    setTimeout(() => {
+      setfollowButtonDisabled(false);
+    }, 1000);
+  };
 
   const handlePostTypeChange = (position) => {
     const updatedCheckedState = checkedState.map((item, index) =>
@@ -47,30 +57,23 @@ export default function Profile() {
     editProfileRef.current.click();
   };
 
+  const fileInputRef = useRef();
+
   useEffect(() => {
     fetch(API_BASE + `/api/profile/${profileId}`, {
       credentials: "include",
     })
       .then((res) => res.json())
-      .then(
-        ({
-          posts,
-          profileUser,
-          followersUsersArr,
-          followingUsersArr,
-          everyPostId,
-        }) => {
-          setProfileUser(profileUser);
-          setPosts(posts);
-          setEveryPostId(everyPostId);
-          setImageEdit({
-            ...imageEdit,
-            preview: profileUser.image,
-          });
-          setFollowersUsersArr(followersUsersArr);
-          setFollowingUsersArr(followingUsersArr);
-        }
-      );
+      .then(({ posts, profileUser, followersUsersArr, followingUsersArr }) => {
+        setProfileUser(profileUser);
+        setPosts(posts);
+        setImageEdit({
+          ...imageEdit,
+          preview: profileUser.image,
+        });
+        setFollowersUsersArr(followersUsersArr);
+        setFollowingUsersArr(followingUsersArr);
+      });
   }, [setProfileUser, profileId]);
 
   if (!user)
@@ -88,17 +91,42 @@ export default function Profile() {
       </div>
     );
 
+  if (profileUser === undefined) return null;
+  else if (profileUser === null) return <h2>Profile not found</h2>;
+
+  // const handleFileChange = (e) => {
+  //   if (e.target.files.length > 5) {
+  //     e.target.value = "";
+  //     setImages([{ preview: "", data: "" }]);
+  //     toast.warning("Please only upload up to a maximum of 5 photos");
+  //   } else if (e.target.files.length > 0) {
+  //     const images = Object.values(e.target.files).map((image) => {
+  //       return {
+  //         preview: URL.createObjectURL(image),
+  //         data: image,
+  //       };
+  //     });
+  //     setImages(images);
+  //   } else {
+  //     setImages([{ preview: "", data: "" }]);
+  //   }
+  // };
+
   const handleFileChange = (e) => {
-    if (e.target.files.length > 0) {
-      const images = Object.values(e.target.files).map((image) => {
-        return {
-          preview: URL.createObjectURL(image),
-          data: image,
-        };
-      });
-      setImages(images);
+    if (e.target.files.length > 0 && uploadImages.files.length < 5) {
+      const image = {
+        preview: URL.createObjectURL(e.target.files[0]),
+        data: Object.values(e.target.files[0]),
+      };
+      setImages({ files: [...images.files, image] });
+      setUploadImages({ files: [...uploadImages.files, e.target.files[0]] });
+    } else if (e.target.files.length > 0 && uploadImages.files.length === 5) {
+      toast.warning(
+        "Only a maximum of 5 photos may be uploaded in a single post."
+      );
     } else {
-      setImages([{ preview: "", data: "" }]);
+      setImages({ files: [] });
+      setUploadImages({ files: [] });
     }
   };
 
@@ -116,12 +144,17 @@ export default function Profile() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    fileInputRef.current.value = null;
     const form = event.currentTarget;
+    const formData = new FormData(event.currentTarget);
+    uploadImages.files.forEach((file) => {
+      formData.append("file", file);
+    });
     const response = await toast.promise(
       // Async request to create a new post document
       fetch(API_BASE + form.getAttribute("action"), {
         method: form.method,
-        body: new FormData(form),
+        body: formData,
         credentials: "include",
       }),
       // React toast promise
@@ -136,12 +169,16 @@ export default function Profile() {
     if (json.post) {
       setPosts([...posts, json.post]);
       form.reset();
+      setMapsLinkText("");
+      setCheckedState(new Array(3).fill(false));
+      setImages({ files: [] });
+      setUploadImages({ files: [] });
       closeCreatePostForm();
-      setImages([{ preview: "", data: "" }]);
     }
   };
 
   const handleFollow = async (event) => {
+    followButtonClick();
     event.preventDefault();
     const form = event.currentTarget;
     const response = await fetch(API_BASE + form.getAttribute("action"), {
@@ -215,8 +252,13 @@ export default function Profile() {
     form.reset();
   };
 
+  const handleMapsLinkTextChange = (e) => {
+    const mapsLinkTextArr = e.target.value.split(" ");
+    setMapsLinkText(mapsLinkTextArr[mapsLinkTextArr.length - 1]);
+  };
+
   return (
-    <div className="container flex row mx-auto bg-base-200">
+    <div className="container">
       {/* Container holding profile picture section and profile stats section */}
       <div className="flex flex-column mt-2 w-full md:w-5/6 mx-auto">
         <div className="flex mx-auto">
@@ -509,11 +551,12 @@ export default function Profile() {
                         <input
                           type="text"
                           required
-                          maxLength="100"
+                          value={mapsLinkText}
                           placeholder="Naver / Kakao Maps link"
                           className="input input-bordered input-primary w-full"
                           id="naverLink"
                           name="naverLink"
+                          onChange={handleMapsLinkTextChange}
                         />
                       </div>
                       {/* Breakfast, Brunch, Bakery type edit */}
@@ -587,20 +630,37 @@ export default function Profile() {
                       </div>
                       {/* Image upload */}
                       <div className="mb-3">
+                        <label className="label text-neutral text-sm">
+                          Upload photos one at a time, in the order you would
+                          like to display them. Max 5.
+                        </label>
                         <input
                           type="file"
-                          multiple
                           required
                           className="file-input file-input-bordered file-input-primary w-full"
                           id="imageUpload"
                           name="file"
                           onChange={handleFileChange}
+                          ref={fileInputRef}
                         />
+
+                        <button
+                          className="btn btn-secondary btn text-neutral mt-3"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.target.value = "";
+                            setImages({ files: [] });
+                            setUploadImages({ files: [] });
+                            toast("Upload files have been reset");
+                          }}
+                        >
+                          Reset upload
+                        </button>
                       </div>
                     </div>
                     {/* Image upload preview  */}
                     <div className="my-3 md:w-1/2 ml-3">
-                      {images[0].preview && (
+                      {images.files.length > 0 && (
                         <div className="indicator w-full">
                           <span className="indicator-item indicator-top indicator-center badge badge-secondary z-10">
                             Upload Preview
@@ -613,7 +673,9 @@ export default function Profile() {
                             {/* Image Carousel with post image previews */}
                             <ImageCarousel
                               key={`${user._id}-post-preview`}
-                              images={images.map((image) => image.preview)}
+                              images={images.files.map(
+                                (image) => image.preview
+                              )}
                               className=""
                             />
                           </div>
@@ -649,6 +711,7 @@ export default function Profile() {
             <button
               className="self-center w-20 h-20 btn btn-ghost"
               type="submit"
+              disabled={followButtonDisabled}
             >
               <img
                 src={
@@ -668,17 +731,17 @@ export default function Profile() {
       <div className="divider"></div>
 
       {/* If the user has no posts, return an h3 saying to make a post, else show PostList */}
+      {profileUser && posts.length === 0 && (
+        <h3 className="text-center text-neutral">
+          pssst... it looks kinda empty here... maybe..
+          <br /> ..maybe post a new Brunchy spot? :)
+        </h3>
+      )}
       <PostList
         posts={posts.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         )}
       />
-      {profileUser && posts.length === 0 && (
-        <h3 className="text-center text-neutral">
-          pssst... it looks kinda empty here... maybe..
-          <br /> ..maybe post your favorite spot? :)
-        </h3>
-      )}
 
       {/* <div className="row mt-5">
         <div className="col-6">

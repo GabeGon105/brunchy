@@ -28,7 +28,10 @@ const UsersList = ({ usersArr, handleClick }) => (
                   {user[1]}
                 </span>
               </Link>
-              <div className="text-sm opacity-50">{user[3].slice(0, 30)}</div>
+              <div className="text-sm opacity-50">
+                {user[3].slice(0, 30)}
+                {user[3].length > 30 ? "..." : ""}
+              </div>
             </div>
           </div>
         </li>

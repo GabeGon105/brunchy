@@ -5,7 +5,7 @@ import SwapIcon from "../components/SwapIcon";
 import { API_BASE } from "../constants";
 
 export default function Feed() {
-  const { user, setEveryPostId } = useOutletContext();
+  const { user } = useOutletContext();
   const [posts, setPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [brunchFilter, setBrunchFilter] = useState(true);
@@ -15,9 +15,8 @@ export default function Feed() {
   useEffect(() => {
     fetch(API_BASE + "/api/saved", { credentials: "include" })
       .then((res) => res.json())
-      .then(({ savedPosts, everyPostId }) => {
+      .then(({ savedPosts }) => {
         setPosts(savedPosts);
-        setEveryPostId(everyPostId);
         setFilteredPosts(savedPosts);
       });
   }, []);
@@ -26,25 +25,20 @@ export default function Feed() {
     // change brunchFilter to the opposite of it's previous state
     setBrunchFilter(!brunchFilter);
   };
-  useEffect(() => {
-    handlePostsFilter();
-  }, [brunchFilter]);
 
   const handleBreakfastFilter = () => {
     // change breakfastFilter to the opposite of it's previous state
     setBreakfastFilter(!breakfastFilter);
   };
-  useEffect(() => {
-    handlePostsFilter();
-  }, [breakfastFilter]);
 
   const handleBakeryFilter = () => {
     // change bakeryFilter to the opposite of it's previous state
     setBakeryFilter(!bakeryFilter);
   };
+
   useEffect(() => {
     handlePostsFilter();
-  }, [bakeryFilter]);
+  }, [brunchFilter, breakfastFilter, bakeryFilter]);
 
   const handlePostsFilter = () => {
     let newFilteredPostsArray = [];
@@ -148,17 +142,17 @@ export default function Feed() {
             click={handleBakeryFilter}
           />
         </div>
-        <PostList
-          posts={filteredPosts.sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          )}
-        />
         {posts.length !== 0 && filteredPosts.length === 0 && (
           <p className="text-neutral text-center mt-5">
             ʕ•ᴥ•ʔ <br />
             No saved posts to show
           </p>
         )}
+        <PostList
+          posts={filteredPosts.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          )}
+        />
       </div>
     </div>
   );

@@ -3,18 +3,187 @@ const passport = require("passport");
 const validator = require("validator");
 const User = require("../models/User");
 const Post = require("../models/Post");
+const Notification = require("../models/Notification");
 
 exports.getUser = async (req, res) => {
   try {
-    const user = req.user || null;
+    const user = await User.findById(req.user.id)
+
+    // Map through updatedUser.notifications and find the notification Obj for each id
+    const notificationsArrPromise = user.notifications.map( async (id) => {
+      const notification = await Notification.findById( id );
+      return notification;
+    } )
+
+    // Await all the notificationPromise functions in Promise.all
+    const notifications = await Promise.all(notificationsArrPromise);
+
     const everyPost = await Post.find();
     const everyPostId = everyPost.map( (post) => post._id );
-    res.json({ user, everyPostId });
+    res.json({ user, everyPostId, notifications });
   }
   catch (err) {
       console.log(err);
     }
 };
+exports.getNotifications = async (req, res) => {
+    try {
+      const updatedUser = await User.findById(req.user.id).populate({
+        path: 'notifications',
+        populate: { path: 'forUser' }
+      })
+
+      // Map through updatedUser.notifications and find the notification Obj for each id
+      const notificationsArrPromise = updatedUser.notifications.map( async (id) => {
+        const notification = await Notification.findById( id );
+        return notification;
+      } )
+
+      // Await all the notificationPromise functions in Promise.all
+      const notifications = await Promise.all(notificationsArrPromise);
+
+      res.json({ updatedUser, notifications });
+    }
+    catch (err) {
+      console.log(err);
+    }
+  };
+  exports.readNotifications = async (req, res) => {
+    try {
+      const notification = await Notification.findById(req.params.id);
+
+      // if it's a follow notification update all follow notifications with the same user to read : true
+      if (notification.type === 'follow') {
+        await Notification.updateMany(
+          {type: notification.type, user: notification.user },
+          { read: true }
+        )
+        console.log(`Follow notification from ${notification.userName} has been set to read!`);
+      }
+
+      // if it's a comment or like notification find all comment or like notifications with the same postId to read : true
+      if ( notification.type === 'comment' || notification.type === 'like' ) {
+        await Notification.updateMany(
+          {type: notification.type, postId: notification.postId },
+          { read: true }
+        )
+        console.log(`${notification.type} notifications from post with ID ${notification.postId} have been set to read!`);
+      }
+
+      const updatedUser = await User.findById(req.user.id).populate({
+        path: 'notifications',
+        populate: { path: 'forUser' }
+      })
+
+      // Map through updatedUser.notifications to find the notification Obj for each id
+      const notificationsArrPromise = updatedUser.notifications.map( async (id) => {
+        return await Notification.findById( id );
+      } )
+
+      // Await all the notificationPromise functions in Promise.all
+      const updatedNotifications = await Promise.all(notificationsArrPromise);
+
+      // return success message and an updated notification object
+      req.flash("success", { msg: "Notification has been read!" });
+      return res.json({ messages: req.flash(), updatedNotifications, updatedUser });
+    }
+    catch (err) {
+      console.log(err);
+    }
+  }
+
+  exports.readAllNotifications = async (req, res) => {
+    try {
+      const updatedUser = await User.findById(req.user.id).populate({
+        path: 'notifications',
+        populate: { path: 'forUser' }
+      })
+
+      // Map through updatedUser.notifications, find the notification Obj for each id, update read to true for each obj, save each object, then return each new notification object
+      const notificationsArrPromise = updatedUser.notifications.map( async (id) => {
+        const notification = await Notification.findById( id );
+        notification.read = true;
+        const updatedNotification = await notification.save()
+        return updatedNotification;
+      } )
+
+      // Await all the notificationPromise functions in Promise.all
+      const updatedNotifications = await Promise.all(notificationsArrPromise);
+
+      console.log("All user notifications have been set to read!")
+
+      // return success message and an updated notification object
+      req.flash("success", { msg: "All notifications have been read!" });
+      return res.json({ messages: req.flash(), updatedNotifications });
+    }
+    catch (err) {
+      console.log(err);
+    }
+  }
+
+exports.deleteNotification = async (req, res) => {
+  try {
+      const notification = await Notification.findById(req.params.id);
+      const user = await User.findById(req.user.id);
+
+      // find the index of the current notification in the user.notifications array, then splice it out of the array
+      const index = user.notifications.indexOf(notification._id);
+      user.notifications.splice(index, 1);
+
+      // if it's a follow notification, delete all follow notifications with the same user
+      if (notification.type === 'follow') {
+        await Notification.deleteMany({type: notification.type, user: notification.user })
+        console.log(`Follow notification from ${notification.userName} has been deleted!`);
+      }
+
+      // if it's a comment or like notification delete all comment or like notifications with the same postId
+      if ( notification.type === 'comment' || notification.type === 'like' ) {
+        await Notification.deleteMany({type: notification.type, postId: notification.postId })
+        console.log(`${notification.type} notifications from post with ID ${notification.postId} have been deleted!`);
+      }
+
+      const updatedUser = await user.save();
+
+      // Map through updatedUser.notifications and find the notification Obj for each id
+      const notificationsArrPromise = updatedUser.notifications.map( async (id) => {
+        const notification = await Notification.findById( id );
+        return notification;
+      } )
+
+      // Await all the notificationPromise functions in Promise.all
+      const updatedNotifications = await Promise.all(notificationsArrPromise);
+
+      // return success message
+      req.flash("success", { msg: "Notification has been deleted!" });
+      return res.json({ messages: req.flash(), updatedNotifications });
+    } catch (err) {
+      console.log(err);
+    }
+}
+
+exports.deleteAllNotifications = async (req, res) => {
+    try {
+      const user = await User.findById(req.user.id).populate({
+        path: 'notifications',
+        populate: { path: 'forUser' }
+      })
+
+      // clear the notifications array of user, then save
+      user.notifications = [];
+      const updatedUser = await user.save();
+
+      // Delete all notifcations with the current user as its forUser
+      await Notification.deleteMany({forUser: req.user.id})
+      console.log("All user notifications have been deleted!")
+
+      // return success message and an updated notification object
+      req.flash("success", { msg: "All notifications have been deleted!" });
+      return res.json({ messages: req.flash(), updatedNotifications: [], updatedUser });
+    }
+    catch (err) {
+      console.log(err);
+    }
+  }
 
 exports.followUser = async (req, res) => {
     try {
@@ -43,6 +212,36 @@ exports.followUser = async (req, res) => {
 
       // push the current user ID to the profile user's followers array
       profileUser.followers.push(req.user.id);
+
+      // splice older follow notifications for this post id from the user notifications array,
+      // delete older follow notifications for this post id,
+      // create a new follow notification object,
+      // then unshift the new notification id to the post user's notifications array
+      const notificationObj = { type: 'follow', user: req.user.id }
+      const currentNotification = await Notification.find(notificationObj);
+      if ( currentNotification[0] ) {
+        // find the index of the current notification in the user.notifications array, then splice it out of the array
+        const index = profileUser.notifications.indexOf(currentNotification[0]._id);
+        profileUser.notifications.splice(index, 1);
+        await profileUser.save();
+        await Notification.deleteOne(notificationObj);
+        console.log(`Deleted previous follow notification for ${profileUser.username}.`);
+      }
+
+      // Create a new follow notification
+      const newNotification = await Notification.create({
+        type: 'follow',
+        forUser: profileUser._id,
+        user: req.user.id,
+        userName: req.user.userName,
+        userImage: req.user.image,
+        read: false,
+      })
+      console.log(`New follow notification created for ${profileUser.userName}.`)
+          
+      // push newNotification._id to profileUser's notifications array
+      profileUser.notifications.unshift(newNotification._id);
+
       const updatedProfileUser = await profileUser.save();
 
       const followed = true;

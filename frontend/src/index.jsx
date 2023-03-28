@@ -19,6 +19,7 @@ import Feed from "./routes/Feed";
 import Post from "./routes/Post";
 import Saved from "./routes/Saved";
 import Search from "./routes/Search";
+import Notifications from "./routes/Notifications";
 
 const router = createBrowserRouter([
   {
@@ -61,6 +62,10 @@ const router = createBrowserRouter([
       {
         path: "/search",
         element: <Search />,
+      },
+      {
+        path: "/notifications",
+        element: <Notifications />,
       },
     ],
   },
