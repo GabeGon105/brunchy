@@ -11,7 +11,7 @@ Explore your city through brunches, breakfasts, and bakeries with Brunchy! A res
 ![javascript logo](https://readme-components.vercel.app/api?component=logo&fill=black&logo=javascript&svgfill=f6df1c)
 ![node.js logo](https://readme-components.vercel.app/api?component=logo&fill=black&logo=node.js&svgfill=f6df1c)
 ![express.js logo](https://readme-components.vercel.app/api?component=logo&fill=black&logo=express.js&svgfill=f6df1c)
-![mongodb logo](https://readme-components.vercel.app/api?component=logo&fill=black&logo=javascript&svgfill=f6df1c)
+![mongodb logo](https://readme-components.vercel.app/api?component=logo&fill=black&logo=mongodb&svgfill=f6df1c)
 ![tailwindcss logo](https://readme-components.vercel.app/api?component=logo&fill=black&logo=tailwindcss)
 ![css3 logo](https://readme-components.vercel.app/api?component=logo&fill=black&logo=CSS3&svgfill=028dd1)
 ![html5 logo](https://readme-components.vercel.app/api?component=logo&fill=black&logo=html5&svgfill=f06629)

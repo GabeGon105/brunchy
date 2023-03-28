@@ -4,7 +4,7 @@
   "description": "Breakfast, Brunch, and Cafes",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon ./backend/server.js",
+    "start": "node ./backend/server.js",
     "build": "npm --prefix frontend run build",
     "postinstall": "npm --prefix frontend install",
     "test": "echo \"Error: no test specified\" && exit 1",
