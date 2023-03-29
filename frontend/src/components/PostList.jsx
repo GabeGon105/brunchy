@@ -1,5 +1,5 @@
 import PostPreview from "./PostPreview";
-import { Masonry } from "@mui/lab";
+import Masonry from "@mui/lab/Masonry";
 
 const PostList = ({ posts }) => (
   <Masonry
