@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node ./backend/server.js",
     "build": "npm --prefix frontend run build",
+    "postbuild": "rm -r frontend/node_modules",
     "postinstall": "npm --prefix frontend install",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "concurrently \"npm start\" \"npm start --prefix frontend\""
