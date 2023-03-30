@@ -68,7 +68,7 @@ connectDB().then(() => {
   app.get('/', renderIndex)
 
   //Static Folder
-  app.use(express.static("../frontend/build"));
+  app.use(express.static(path.join(__dirname, "../frontend/build")));
 
   //Setup Routes For Which The Server Is Listening
   app.use("/", mainRoutes);
