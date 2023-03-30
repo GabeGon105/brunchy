@@ -38,7 +38,7 @@
     ]
   },
   "proxy": "http://localhost:2121",
-  "homepage": "https://uninterested-calf-overcoat.cyclic.app/",
+  "homepage": ".",
   "devDependencies": {
     "tailwindcss": "^3.2.4"
   }
