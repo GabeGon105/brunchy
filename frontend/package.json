@@ -38,6 +38,7 @@
     ]
   },
   "proxy": "http://localhost:2121",
+  "homepage": "./",
   "devDependencies": {
     "tailwindcss": "^3.2.4"
   }
