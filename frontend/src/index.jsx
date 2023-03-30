@@ -18,7 +18,7 @@ import Notifications from "./routes/Notifications";
 const router = createHashRouter([
   {
     path: "/",
-    element: <Root />,
+    element: <Root initialUser={window.r2InitialUser} />,
     errorElement: <ErrorPage />,
     children: [
       {
