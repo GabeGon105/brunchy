@@ -1,10 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import {
-  createBrowserRouter,
-  createHashRouter,
-  RouterProvider,
-} from "react-router-dom";
+import { createHashRouter, RouterProvider } from "react-router-dom";
 import "./style.css";
 import App from "./App";
 import Root from "./routes/Root";
@@ -19,11 +15,7 @@ import Saved from "./routes/Saved";
 import Search from "./routes/Search";
 import Notifications from "./routes/Notifications";
 
-const createOurRouter =
-  process.env.REACT_APP_HASHROUTER === "true"
-    ? createHashRouter
-    : createBrowserRouter;
-const router = createOurRouter([
+const router = createHashRouter([
   {
     path: "/",
     element: <Root />,
