@@ -75,9 +75,7 @@ connectDB().then(() => {
   app.use("/api/post", postRoutes);
   app.use("/api/comment", commentRoutes);
 
-  app.use('*', (_, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
-});
+  app.use('*', renderIndex);
 
   //Server Running
   app.listen(process.env.PORT, () => {
