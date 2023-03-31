@@ -62,7 +62,7 @@ export default function Signup() {
         </div>
 
         {/* Sign Up Form */}
-        <div className="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100 ml-10">
+        <div className="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
           <div className="card-body">
             <form
               action="/signup"
