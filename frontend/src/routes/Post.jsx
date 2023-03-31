@@ -67,31 +67,38 @@ export default function Post() {
   };
 
   useEffect(() => {
-    fetch(API_BASE + `/api/post/${postId}`, { credentials: "include" })
-      .then((res) => res.json())
-      .then(({ post, comments, like, save, postUser, likesUsersArr }) => {
-        // use the post.createdAt property to calculate the current date and assign this value to post.date
-        const dateArray = new Date(post.createdAt).toString().split(" ");
-        const date = `${dateArray[2]} ${dateArray[1]}, ${dateArray[3]}`;
-        post.date = date;
+    toast.promise(
+      fetch(API_BASE + `/api/post/${postId}`, { credentials: "include" })
+        .then((res) => res.json())
+        .then(({ post, comments, like, save, postUser, likesUsersArr }) => {
+          // use the post.createdAt property to calculate the current date and assign this value to post.date
+          const dateArray = new Date(post.createdAt).toString().split(" ");
+          const date = `${dateArray[2]} ${dateArray[1]}, ${dateArray[3]}`;
+          post.date = date;
 
-        setPost(post);
-        setComments(comments);
-        // if the post has been liked by the current user like will exist, else it will not exist and like will be false
-        setLike(like.length > 0);
-        // if the post has been saved by the current user save will exist, else it will not exist and save will be false
-        setSave(save.length > 0);
-        setPostUser(postUser);
-        setLikesUsersArr(likesUsersArr);
-        setMapsLinkText(post.naverLink);
-        setCheckedState([
-          post.type.includes("Brunch"),
-          post.type.includes("Breakfast"),
-          post.type.includes("Bakery"),
-        ]);
+          setPost(post);
+          setComments(comments);
+          // if the post has been liked by the current user like will exist, else it will not exist and like will be false
+          setLike(like.length > 0);
+          // if the post has been saved by the current user save will exist, else it will not exist and save will be false
+          setSave(save.length > 0);
+          setPostUser(postUser);
+          setLikesUsersArr(likesUsersArr);
+          setMapsLinkText(post.naverLink);
+          setCheckedState([
+            post.type.includes("Brunch"),
+            post.type.includes("Breakfast"),
+            post.type.includes("Bakery"),
+          ]);
 
-        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-      });
+          window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        }),
+      // React toast promise
+      {
+        pending: "Loading post...",
+        error: "Uh-oh. We couldn't load this post 🤯",
+      }
+    );
   }, [setPost, postId]);
 
   if (!user)

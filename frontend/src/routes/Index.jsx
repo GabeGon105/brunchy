@@ -16,11 +16,19 @@ export default function Index() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
-    const response = await fetch(API_BASE + form.getAttribute("action"), {
-      method: form.method,
-      body: new URLSearchParams(new FormData(form)),
-      credentials: "include",
-    });
+    const response = await toast.promise(
+      fetch(API_BASE + form.getAttribute("action"), {
+        method: form.method,
+        body: new URLSearchParams(new FormData(form)),
+        credentials: "include",
+      }),
+      // React toast promise
+      {
+        pending: "Logging in...",
+        success: "Welcome back to Brunchy!",
+        error: "Uh-oh. We couldn't log you in 🤯",
+      }
+    );
     const json = await response.json();
     if (json.messages.errors) {
       // React toastify errors message

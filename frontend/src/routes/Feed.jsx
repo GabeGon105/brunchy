@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useOutletContext, Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import PostList from "../components/PostList";
 import SwapIcon from "../components/SwapIcon";
 import { API_BASE } from "../constants";
@@ -14,12 +15,19 @@ export default function Feed() {
   const [bakeryFilter, setBakeryFilter] = useState(true);
 
   useEffect(() => {
-    fetch(API_BASE + "/api/feed", { credentials: "include" })
-      .then((res) => res.json())
-      .then(async ({ posts }) => {
-        setPosts(posts);
-        setFilteredPosts(posts);
-      });
+    toast.promise(
+      fetch(API_BASE + "/api/feed", { credentials: "include" })
+        .then((res) => res.json())
+        .then(async ({ posts }) => {
+          setPosts(posts);
+          setFilteredPosts(posts);
+        }),
+      // React toast promise
+      {
+        pending: "Loading feed...",
+        error: "Uh-oh. We couldn't load feed 🤯",
+      }
+    );
   }, []);
 
   const handleFollowingFilter = () => {

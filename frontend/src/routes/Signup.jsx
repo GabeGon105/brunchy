@@ -18,11 +18,19 @@ export default function Signup() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
-    const response = await fetch(API_BASE + form.getAttribute("action"), {
-      method: form.method,
-      body: new URLSearchParams(new FormData(form)),
-      credentials: "include",
-    });
+    const response = await toast.promise(
+      fetch(API_BASE + form.getAttribute("action"), {
+        method: form.method,
+        body: new URLSearchParams(new FormData(form)),
+        credentials: "include",
+      }),
+      // React toast promise
+      {
+        pending: "Your account is being created 🤓",
+        success: "Your account has been added!",
+        error: "Uh-oh. We couldn't create your account 🤯",
+      }
+    );
     const json = await response.json();
     if (json.messages.errors) {
       // React toastify errors messages

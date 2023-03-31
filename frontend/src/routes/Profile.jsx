@@ -60,20 +60,29 @@ export default function Profile() {
   const fileInputRef = useRef();
 
   useEffect(() => {
-    fetch(API_BASE + `/api/profile/${profileId}`, {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then(({ posts, profileUser, followersUsersArr, followingUsersArr }) => {
-        setProfileUser(profileUser);
-        setPosts(posts);
-        setImageEdit({
-          ...imageEdit,
-          preview: profileUser.image,
-        });
-        setFollowersUsersArr(followersUsersArr);
-        setFollowingUsersArr(followingUsersArr);
-      });
+    toast.promise(
+      fetch(API_BASE + `/api/profile/${profileId}`, {
+        credentials: "include",
+      })
+        .then((res) => res.json())
+        .then(
+          ({ posts, profileUser, followersUsersArr, followingUsersArr }) => {
+            setProfileUser(profileUser);
+            setPosts(posts);
+            setImageEdit({
+              ...imageEdit,
+              preview: profileUser.image,
+            });
+            setFollowersUsersArr(followersUsersArr);
+            setFollowingUsersArr(followingUsersArr);
+          }
+        ),
+      // React toast promise
+      {
+        pending: "Loading profile...",
+        error: "Uh-oh. We couldn't load this profile 🤯",
+      }
+    );
   }, [setProfileUser, profileId]);
 
   if (!user)

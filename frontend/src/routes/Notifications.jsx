@@ -4,6 +4,7 @@ import Notification from "../components/Notification";
 import { API_BASE } from "../constants";
 import trash from "../images/trash-color.png";
 import read from "../images/read.png";
+import { toast } from "react-toastify";
 
 export default function Notifications() {
   const {
@@ -30,17 +31,24 @@ export default function Notifications() {
   };
 
   useEffect(() => {
-    fetch(API_BASE + "/api/notifications", {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then(({ updatedUser, notifications }) => {
-        setUser(updatedUser);
-        setUserNotifications(notifications);
-        setUnreadUserNotifications(
-          notifications.some((notification) => !notification.read)
-        );
-      });
+    toast.promise(
+      fetch(API_BASE + "/api/notifications", {
+        credentials: "include",
+      })
+        .then((res) => res.json())
+        .then(({ updatedUser, notifications }) => {
+          setUser(updatedUser);
+          setUserNotifications(notifications);
+          setUnreadUserNotifications(
+            notifications.some((notification) => !notification.read)
+          );
+        }),
+      // React toast promise
+      {
+        pending: "Loading notifications...",
+        error: "Uh-oh. We couldn't load notifications 🤯",
+      }
+    );
   }, []);
 
   if (!user)

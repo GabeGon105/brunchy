@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useOutletContext, Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import PostList from "../components/PostList";
 import SwapIcon from "../components/SwapIcon";
 import { API_BASE } from "../constants";
@@ -13,12 +14,19 @@ export default function Feed() {
   const [bakeryFilter, setBakeryFilter] = useState(true);
 
   useEffect(() => {
-    fetch(API_BASE + "/api/saved", { credentials: "include" })
-      .then((res) => res.json())
-      .then(({ savedPosts }) => {
-        setPosts(savedPosts);
-        setFilteredPosts(savedPosts);
-      });
+    toast.promise(
+      fetch(API_BASE + "/api/saved", { credentials: "include" })
+        .then((res) => res.json())
+        .then(({ savedPosts }) => {
+          setPosts(savedPosts);
+          setFilteredPosts(savedPosts);
+        }),
+      // React toast promise
+      {
+        pending: "Loading saved posts...",
+        error: "Uh-oh. We couldn't load saved posts 🤯",
+      }
+    );
   }, []);
 
   const handleBrunchFilter = () => {
