@@ -51,7 +51,7 @@ module.exports = {
       console.log(err);
     }
   },
-  getSearch: async (req, res) => {
+  getSearchPosts: async (req, res) => {
     try {
       const allPosts = await Post.find().sort({ createdAt: "desc" }).populate('likes').populate({
         path: 'comments',
@@ -66,7 +66,6 @@ module.exports = {
         || post.comments.some( comment => comment.text.toLowerCase().includes(searchText) )
       } )
 
-      
       res.json({posts});
     } catch (err) {
       console.log(err);

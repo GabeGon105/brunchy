@@ -104,16 +104,16 @@ export default function Profile() {
   else if (profileUser === null) return <h2>Profile not found</h2>;
 
   const handleFileChange = (e) => {
-    if (e.target.files.length > 0 && uploadImages.files.length < 5) {
+    if (e.target.files.length > 0 && uploadImages.files.length < 4) {
       const image = {
         preview: URL.createObjectURL(e.target.files[0]),
         data: Object.values(e.target.files[0]),
       };
       setImages({ files: [...images.files, image] });
       setUploadImages({ files: [...uploadImages.files, e.target.files[0]] });
-    } else if (e.target.files.length > 0 && uploadImages.files.length === 5) {
+    } else if (e.target.files.length > 0 && uploadImages.files.length === 4) {
       toast.warning(
-        "Only a maximum of 5 photos may be uploaded in a single post."
+        "Only a maximum of 4 photos may be uploaded in a single post."
       );
     } else {
       setImages({ files: [] });
@@ -620,7 +620,7 @@ export default function Profile() {
                       <div className="mb-3">
                         <label className="label text-neutral text-sm">
                           Upload photos one at a time, in the order you would
-                          like to display them. Max 5.
+                          like to display them. Max 4.
                         </label>
                         <input
                           type="file"
@@ -714,12 +714,17 @@ export default function Profile() {
 
       <div className="divider"></div>
 
-      {/* If the user has no posts, return an h3 saying to make a post, else show PostList */}
-      {profileUser && posts.length === 0 && (
+      {/* If the profile user id matches the user id and the user has no posts, return an h3 saying to make a post, else show PostList */}
+      {profileUser && profileId === user._id && posts.length === 0 && (
         <h3 className="text-center text-neutral">
-          pssst... it looks kinda empty here... maybe..
+          ʕ•ᴥ•ʔ
+          <br /> pssst... it looks kinda empty here...
+          <br /> maybe...
           <br /> ..maybe post a new Brunchy spot? :)
         </h3>
+      )}
+      {profileUser && profileId !== user._id && posts.length === 0 && (
+        <h3 className="text-center text-neutral">ʕ•ᴥ•ʔ</h3>
       )}
       <PostList
         posts={posts.sort(

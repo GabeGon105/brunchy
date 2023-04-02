@@ -11,7 +11,8 @@ router.get("/api/profile/:id", ensureAuth, postsController.getProfile);
 router.get("/api/notifications", ensureAuth, authController.getNotifications);
 router.get("/api/feed", ensureAuth, postsController.getFeed);
 router.get("/api/saved", ensureAuth, postsController.getSaved);
-router.get("/api/search/:searchText", ensureAuth, postsController.getSearch);
+router.get("/api/searchPosts/:searchText", ensureAuth, postsController.getSearchPosts);
+router.get("/api/searchUsers/:searchText", ensureAuth, authController.getSearchUsers);
 router.get("/logout", authController.logout);
 
 router.post("/login", authController.postLogin);

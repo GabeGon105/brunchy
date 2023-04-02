@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useOutletContext, Link } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
+import UsersList from "../components/UsersList";
 import PostList from "../components/PostList";
 import SwapIcon from "../components/SwapIcon";
 import { API_BASE } from "../constants";
@@ -8,6 +9,9 @@ import { API_BASE } from "../constants";
 export default function Search() {
   const { user } = useOutletContext();
   const [posts, setPosts] = useState([]);
+  const [searchPostsActive, setSearchPostsActive] = useState(true);
+  const [searchUsersActive, setSearchUsersActive] = useState(false);
+  const [usersArr, setUsersArr] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [brunchFilter, setBrunchFilter] = useState(true);
@@ -16,9 +20,10 @@ export default function Search() {
 
   // If searchText is not empty, fetch the data for the text input
   useEffect(() => {
-    if (searchText !== "") {
+    // Posts search
+    if (searchPostsActive === true && searchText !== "") {
       const timeoutId = setTimeout(() => {
-        fetch(API_BASE + `/api/search/${searchText}`, {
+        fetch(API_BASE + `/api/searchPosts/${searchText}`, {
           credentials: "include",
         })
           .then((res) => res.json())
@@ -29,7 +34,42 @@ export default function Search() {
       }, 1000);
       return () => clearTimeout(timeoutId);
     }
+    // Users search
+    if (searchUsersActive === true && searchText !== "") {
+      const timeoutId = setTimeout(() => {
+        fetch(API_BASE + `/api/searchUsers/${searchText}`, {
+          credentials: "include",
+        })
+          .then((res) => res.json())
+          .then(({ users }) => {
+            setUsersArr(users);
+          });
+      }, 1000);
+      return () => clearTimeout(timeoutId);
+    }
   }, [searchText]);
+
+  const handleSearchPostsClick = () => {
+    if (searchPostsActive === false) {
+      setSearchText("");
+      setPosts([]);
+      setBrunchFilter(true);
+      setBreakfastFilter(true);
+      setBakeryFilter(true);
+      setFilteredPosts([]);
+      setSearchPostsActive(true);
+      setSearchUsersActive(false);
+    }
+  };
+
+  const handleSearchUsersClick = () => {
+    if (searchUsersActive === false) {
+      setSearchText("");
+      setUsersArr([]);
+      setSearchUsersActive(true);
+      setSearchPostsActive(false);
+    }
+  };
 
   const handleBrunchFilter = () => {
     // change brunchFilter to the opposite of it's previous state
@@ -123,47 +163,86 @@ export default function Search() {
   return (
     <div className="container">
       <div className="row justify-content-center mt-4">
-        <h2 className="text-center text-neutral font-semibold text-xl mb-3">
-          Search Posts
-        </h2>
-        <SearchBar searchText={searchText} setSearchText={setSearchText} />
-        <div className="flex w-full sm:w-2/3 md:w-1/2 lg:w1-/3 justify-evenly mb-4">
-          <SwapIcon
-            className="w-1/3"
-            key="brunch-filter"
-            filter={brunchFilter}
-            swapOn={swapOnBadges[0]}
-            swapOff={swapOffBadges[0]}
-            click={handleBrunchFilter}
-          />
-          <SwapIcon
-            className="w-1/3"
-            key="breakfast-filter"
-            filter={breakfastFilter}
-            swapOn={swapOnBadges[1]}
-            swapOff={swapOffBadges[1]}
-            click={handleBreakfastFilter}
-          />
-          <SwapIcon
-            className="w-1/3"
-            key="bakery-filter"
-            filter={bakeryFilter}
-            swapOn={swapOnBadges[2]}
-            swapOff={swapOffBadges[2]}
-            click={handleBakeryFilter}
-          />
+        <div className="tabs tabs-boxed flex w-full sm:w-2/3 md:w-1/2 lg:w1-/3 justify-evenly">
+          <h2
+            className={`tab ${
+              searchPostsActive ? "tab-active" : ""
+            } text-center text-neutral font-semibold text-xl mb-3`}
+            onClick={handleSearchPostsClick}
+          >
+            Search Posts
+          </h2>
+          <h2
+            className={`tab ${
+              searchUsersActive ? "tab-active" : ""
+            } text-center text-neutral font-semibold text-xl mb-3`}
+            onClick={handleSearchUsersClick}
+          >
+            Search Users
+          </h2>
         </div>
-        {filteredPosts.length === 0 && (
-          <p className="text-neutral text-center mt-4">
-            ? <br />
-            ʕ•ᴥ•ʔ
-          </p>
+        {searchPostsActive && (
+          <>
+            <SearchBar
+              searchType={searchPostsActive ? "posts" : "users"}
+              searchText={searchText}
+              setSearchText={setSearchText}
+            />
+            <div className="flex w-full sm:w-2/3 md:w-1/2 lg:w1-/3 justify-evenly mb-4">
+              <SwapIcon
+                className="w-1/3"
+                key="brunch-filter"
+                filter={brunchFilter}
+                swapOn={swapOnBadges[0]}
+                swapOff={swapOffBadges[0]}
+                click={handleBrunchFilter}
+              />
+              <SwapIcon
+                className="w-1/3"
+                key="breakfast-filter"
+                filter={breakfastFilter}
+                swapOn={swapOnBadges[1]}
+                swapOff={swapOffBadges[1]}
+                click={handleBreakfastFilter}
+              />
+              <SwapIcon
+                className="w-1/3"
+                key="bakery-filter"
+                filter={bakeryFilter}
+                swapOn={swapOnBadges[2]}
+                swapOff={swapOffBadges[2]}
+                click={handleBakeryFilter}
+              />
+            </div>
+            {filteredPosts.length === 0 && (
+              <p className="text-neutral text-center mt-4">
+                ? <br />
+                ʕ•ᴥ•ʔ
+              </p>
+            )}
+            <PostList
+              posts={filteredPosts.sort(
+                (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+              )}
+            />
+          </>
         )}
-        <PostList
-          posts={filteredPosts.sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          )}
-        />
+        {searchUsersActive && (
+          <>
+            <SearchBar
+              searchType={searchPostsActive ? "posts" : "users"}
+              searchText={searchText}
+              setSearchText={setSearchText}
+            />
+            {usersArr.length === 0 && (
+              <p className="text-neutral text-center mt-4">
+                ? <br />
+                ʕ•ᴥ•ʔ
+              </p>
+            )}
+            <UsersList usersArr={usersArr} />
+          </>
+        )}
       </div>
     </div>
   );

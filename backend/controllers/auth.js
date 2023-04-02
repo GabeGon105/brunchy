@@ -185,6 +185,26 @@ exports.deleteAllNotifications = async (req, res) => {
     }
   }
 
+exports.getSearchUsers = async (req, res) => {
+    try {
+      const allUsers = await User.find().lean();
+      
+      const searchText = req.params.searchText.toLowerCase();
+      // filter only users with userName properties that contain the search text
+      const filteredUsers = allUsers.filter( user => {
+        return user.userName.toLowerCase().includes(searchText);
+      } )
+
+      const users = filteredUsers.map( (user) => {
+        return [user._id, user.userName, user.image, user.bio]
+      })
+
+      res.json({users});
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
 exports.followUser = async (req, res) => {
     try {
       // Find the current user and the profile user
@@ -312,13 +332,26 @@ exports.postLogin = (req, res, next) => {
       req.flash("errors", info);
       return res.json({ messages: req.flash() });
     }
-    req.logIn(user, (err) => {
+    req.logIn(user, async (err) => {
       if (err) {
         return next(err);
       }
+
+      // Map through user.notifications and find the notification Obj for each id
+      const notificationsArrPromise = user.notifications.map( async (id) => {
+      const notification = await Notification.findById( id );
+      return notification;
+      } )
+
+      // Await all the notificationPromise functions in Promise.all
+      const notifications = await Promise.all(notificationsArrPromise);
+
+      const everyPost = await Post.find();
+      const everyPostId = everyPost.map( (post) => post._id );
+
       // Send success message
       req.flash("success", { msg: "Success! You are logged in." });
-      res.json({ user, messages: req.flash() });
+      res.json({ user, everyPostId, notifications, messages: req.flash() });
     });
   })(req, res, next);
 };

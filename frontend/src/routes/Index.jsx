@@ -10,7 +10,6 @@ export default function Index() {
 
   if (user) {
     navigate(`/profile/${user._id}`);
-    window.location.reload();
   }
 
   const handleSubmit = async (event) => {
@@ -34,14 +33,13 @@ export default function Index() {
       // React toastify errors message
       json.messages.errors.map((el) => toast.error(el.msg));
     }
-    if (json.messages.success) {
-      // React toastify success message
-      json.messages.success.map((el) => toast.success(el.msg));
-    }
+    // if (json.messages.success) {
+    //   // React toastify success message
+    //   json.messages.success.map((el) => toast.success(el.msg));
+    // }
     if (json.user) {
       setUser(json.user);
       navigate(`/profile/${json.user._id}`);
-      window.location.reload();
     }
   };
 
@@ -73,8 +71,11 @@ export default function Index() {
               className=""
             >
               <div className="form-control border-0 bg-base-100">
+                <label className="label text-neutral" htmlFor="email">
+                  Email
+                </label>
                 <input
-                  id="exampleInputEmail1"
+                  id="email"
                   aria-describedby="emailHelp"
                   name="email"
                   type="email"
@@ -83,6 +84,9 @@ export default function Index() {
                 />
               </div>
               <div className="form-control border-0 mt-2 bg-base-100">
+                <label className="label text-neutral" htmlFor="password">
+                  Password
+                </label>
                 <input
                   id="password"
                   name="password"
