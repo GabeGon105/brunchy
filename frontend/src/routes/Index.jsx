@@ -5,7 +5,14 @@ import { toast } from "react-toastify";
 import brunchy from "../images/brunchy-color.png";
 
 export default function Index() {
-  const { user, setUser, setMessages } = useOutletContext();
+  const {
+    user,
+    setUser,
+    setEveryPostId,
+    setUserNotifications,
+    setUnreadUserNotifications,
+    setMessages,
+  } = useOutletContext();
   const navigate = useNavigate();
 
   if (user) {
@@ -39,6 +46,11 @@ export default function Index() {
     // }
     if (json.user) {
       setUser(json.user);
+      setEveryPostId(json.everyPostId);
+      setUserNotifications(json.notifications);
+      setUnreadUserNotifications(
+        json.notifications.some((notification) => !notification.read)
+      );
       navigate(`/profile/${json.user._id}`);
     }
   };
