@@ -57,10 +57,10 @@ exports.getNotifications = async (req, res) => {
     try {
       const notification = await Notification.findById(req.params.id);
 
-      // if it's a follow notification update all follow notifications with the same user to read : true
+      // if it's a follow notification update all follow notifications with the same user and same forUser to read : true
       if (notification.type === 'follow') {
         await Notification.updateMany(
-          {type: notification.type, user: notification.user },
+          {type: notification.type, user: notification.user, forUser: notification.forUser },
           { read: true }
         )
         console.log(`Follow notification from ${notification.userName} has been set to read!`);
@@ -135,9 +135,9 @@ exports.deleteNotification = async (req, res) => {
       const index = user.notifications.indexOf(notification._id);
       user.notifications.splice(index, 1);
 
-      // if it's a follow notification, delete all follow notifications with the same user
+      // if it's a follow notification, delete all follow notifications with the same user and same forUser
       if (notification.type === 'follow') {
-        await Notification.deleteMany({type: notification.type, user: notification.user })
+        await Notification.deleteMany({type: notification.type,  user: notification.user, forUser: notification.forUser })
         console.log(`Follow notification from ${notification.userName} has been deleted!`);
       }
 
