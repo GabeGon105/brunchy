@@ -717,10 +717,8 @@ export default function Profile() {
       {/* If the profile user id matches the user id and the user has no posts, return an h3 saying to make a post, else show PostList */}
       {profileUser && profileId === user._id && posts.length === 0 && (
         <h3 className="text-center text-neutral">
-          ʕ•ᴥ•ʔ
-          <br /> pssst... it looks kinda empty here...
-          <br /> maybe...
-          <br /> ..maybe post a new Brunchy spot? :)
+          ʕ•ᴥ•ʔ - Pssst..
+          <br /> Maybe post a new Brunchy spot? :)
         </h3>
       )}
       {profileUser && profileId !== user._id && posts.length === 0 && (
