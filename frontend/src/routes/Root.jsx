@@ -35,24 +35,15 @@ export default function Root() {
     fetch(API_BASE + "/api/user", { credentials: "include" })
       .then((res) => res.json())
       .then((res) => {
-        setUser(res.user);
-        setEveryPostId(res.everyPostId);
-        setUserNotifications(res.notifications);
-        setUnreadUserNotifications(
-          res.notifications.some((notification) => !notification.read)
-        );
+        if (res.user) {
+          setUser(res.user);
+          setEveryPostId(res.everyPostId);
+          setUserNotifications(res.notifications);
+          setUnreadUserNotifications(
+            res.notifications.some((notification) => !notification.read)
+          );
+        }
       });
-  }, []);
-
-  useEffect(() => {
-    const listener = (e) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        setMessages({});
-      }
-    };
-    window.addEventListener("keydown", listener);
-    return () => window.removeEventListener("keydown", listener);
   }, []);
 
   // Update the user every 1 minute to update notifications and everyPostId for random post button
@@ -62,12 +53,14 @@ export default function Root() {
       fetch(API_BASE + "/api/user", { credentials: "include" })
         .then((res) => res.json())
         .then((res) => {
-          setUser(res.user);
-          setUserNotifications(res.notifications);
-          setEveryPostId(res.everyPostId);
-          setUnreadUserNotifications(
-            res.notifications.some((notification) => !notification.read)
-          );
+          if (res.user) {
+            setUser(res.user);
+            setUserNotifications(res.notifications);
+            setEveryPostId(res.everyPostId);
+            setUnreadUserNotifications(
+              res.notifications.some((notification) => !notification.read)
+            );
+          }
         });
     }, MINUTE_MS);
     return () => clearInterval(interval);

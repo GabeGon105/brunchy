@@ -7,20 +7,25 @@ const Notification = require("../models/Notification");
 
 exports.getUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id)
+    const user = req.user ? await User.findById(req.user.id) : null
 
-    // Map through updatedUser.notifications and find the notification Obj for each id
-    const notificationsArrPromise = user.notifications.map( async (id) => {
-      const notification = await Notification.findById( id );
-      return notification;
-    } )
+    if (user) {
+      // Map through updatedUser.notifications and find the notification Obj for each id
+      const notificationsArrPromise = user.notifications.map( async (id) => {
+        const notification = await Notification.findById( id );
+        return notification;
+      } )
 
-    // Await all the notificationPromise functions in Promise.all
-    const notifications = await Promise.all(notificationsArrPromise);
+      // Await all the notificationPromise functions in Promise.all
+      const notifications = await Promise.all(notificationsArrPromise);
 
-    const everyPost = await Post.find();
-    const everyPostId = everyPost.map( (post) => post._id );
-    res.json({ user, everyPostId, notifications });
+      const everyPost = await Post.find();
+      const everyPostId = everyPost.map( (post) => post._id );
+      res.json({ user, everyPostId, notifications });
+    }
+    else {
+      res.json({user});
+    }
   }
   catch (err) {
       console.log(err);
