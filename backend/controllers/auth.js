@@ -411,10 +411,15 @@ exports.postSignup = (req, res, next) => {
         });
         return res.json({ messages: req.flash() });
       }
-      user.save((err) => {
+      user.save(async (err) => {
         if (err) {
           return next(err);
         }
+        // find Gooby's user document and add user._id to its following array
+        const goobyUser = await User.findById('642c0cb96119c49a234f6a8f');
+        goobyUser.followers.push(user._id.toString());
+        goobyUser.save();
+
         req.logIn(user, (err) => {
           if (err) {
             return next(err);

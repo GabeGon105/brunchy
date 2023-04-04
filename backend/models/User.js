@@ -24,7 +24,10 @@ const UserSchema = new mongoose.Schema({
     default: ''
   },
   followers: Array,
-  following: ["6426469e77df205905c61967"],
+  following: {
+    type: Array,
+    default: ['642c0cb96119c49a234f6a8f']
+  },
   postsLiked: Array,
   postsSaved: Array,
   notifications: Array,

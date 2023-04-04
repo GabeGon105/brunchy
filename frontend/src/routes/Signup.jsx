@@ -27,7 +27,6 @@ export default function Signup() {
       // React toast promise
       {
         pending: "Your account is being created 🤓",
-        success: "Your account has been added!",
         error: "Uh-oh. We couldn't create your account 🤯",
       }
     );
@@ -42,6 +41,7 @@ export default function Signup() {
     }
     if (json.user) {
       setUser(json.user);
+      toast.success("Your account has been added!");
       navigate(`/profile/${json.user._id}`);
     }
   };
