@@ -292,7 +292,7 @@ exports.editUser = async (req, res) => {
         }
 
         // Upload new photo to Cloudinary
-        const result = await cloudinary.uploader.upload(req.file.path);
+        const result = await cloudinary.uploader.upload(req.file.path, {quality: "auto", fetch_format: "auto"});
 
         // Assign new values to user profile photo
         user.cloudinaryId = result.public_id;

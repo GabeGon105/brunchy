@@ -31,7 +31,6 @@ export default function Index() {
       // React toast promise
       {
         pending: "Logging in...",
-        success: "Welcome back to Brunchy!",
         error: "Uh-oh. We couldn't log you in 🤯",
       }
     );
@@ -52,6 +51,7 @@ export default function Index() {
         json.notifications.some((notification) => !notification.read)
       );
       navigate(`/profile/${json.user._id}`);
+      toast.success("Welcome back to Brunchy!");
     }
   };
 

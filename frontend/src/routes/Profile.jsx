@@ -119,6 +119,7 @@ export default function Profile() {
       setImages({ files: [] });
       setUploadImages({ files: [] });
     }
+    console.log(uploadImages);
   };
 
   const handleFileChangeEdit = (e) => {
@@ -151,7 +152,6 @@ export default function Profile() {
       // React toast promise
       {
         pending: "Your post is being created 🤓",
-        success: "Your post has been added!",
         error: "Uh-oh. We couldn't create your post 🤯",
       }
     );
@@ -165,6 +165,7 @@ export default function Profile() {
       setImages({ files: [] });
       setUploadImages({ files: [] });
       closeCreatePostForm();
+      toast.success("Your post has been added!");
     }
   };
 
@@ -610,6 +611,7 @@ export default function Profile() {
                         <textarea
                           required
                           maxLength="2000"
+                          rows="6"
                           className="textarea textarea-primary w-full"
                           placeholder="Description"
                           id="caption"

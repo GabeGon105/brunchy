@@ -134,7 +134,7 @@ module.exports = {
 
       // Upload images to cloudinary
       let multiplePicturePromise = result.map( async (picture) => {
-        const res = await cloudinary.uploader.upload(picture.path);
+        const res = await cloudinary.uploader.upload(picture.path, {quality: "auto", fetch_format: "auto"});
         return [ res.secure_url, res.public_id ];
       });
 

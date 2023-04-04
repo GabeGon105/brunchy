@@ -456,7 +456,7 @@ export default function Post() {
                                     <textarea
                                       required
                                       maxLength="2000"
-                                      rows="5"
+                                      rows="6"
                                       className="textarea textarea-primary w-full"
                                       defaultValue={post.caption}
                                       id="caption"
@@ -680,7 +680,7 @@ export default function Post() {
                 name="text"
                 required
                 maxLength="600"
-                rows="3"
+                rows="4"
                 placeholder="Add a comment..."
               ></textarea>
               <button
