@@ -38,10 +38,12 @@ export default function Notifications() {
         .then((res) => res.json())
         .then(({ updatedUser, notifications }) => {
           setUser(updatedUser);
-          setUserNotifications(notifications);
-          setUnreadUserNotifications(
-            notifications.some((notification) => !notification.read)
-          );
+          if (notifications.length) {
+            setUserNotifications(notifications);
+            setUnreadUserNotifications(
+              notifications.some((notification) => !notification.read)
+            );
+          }
         }),
       // React toast promise
       {

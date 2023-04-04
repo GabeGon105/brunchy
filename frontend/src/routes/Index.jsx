@@ -46,10 +46,13 @@ export default function Index() {
     if (json.user) {
       setUser(json.user);
       setEveryPostId(json.everyPostId);
-      setUserNotifications(json.notifications);
-      setUnreadUserNotifications(
-        json.notifications.some((notification) => !notification.read)
-      );
+      if (json.notifications.length) {
+        setUserNotifications(json.notifications);
+        setUnreadUserNotifications(
+          json.notifications.some((notification) => !notification.read)
+        );
+      }
+
       navigate(`/profile/${json.user._id}`);
       toast.success("Welcome back to Brunchy!");
     }

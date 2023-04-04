@@ -38,7 +38,9 @@ module.exports = {
       // Await all the notificationPromise functions in Promise.all
       const notifications = await Promise.all(notificationsArrPromise);
 
-      res.json({posts, profileUser, followersUsersArr, followingUsersArr, notifications });
+      const notificationsFiltered = notifications.filter((notification) => notification !== null);
+
+      res.json({posts, profileUser, followersUsersArr, followingUsersArr, notifications: notificationsFiltered });
     } catch (err) {
       console.log(err);
     }

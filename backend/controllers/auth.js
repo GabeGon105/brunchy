@@ -19,9 +19,11 @@ exports.getUser = async (req, res) => {
       // Await all the notificationPromise functions in Promise.all
       const notifications = await Promise.all(notificationsArrPromise);
 
+      const notificationsFiltered = notifications.filter((notification) => notification !== null);
+
       const everyPost = await Post.find();
       const everyPostId = everyPost.map( (post) => post._id );
-      res.json({ user, everyPostId, notifications });
+      res.json({ user, everyPostId, notifications: notificationsFiltered });
     }
     else {
       res.json({user});
@@ -47,7 +49,9 @@ exports.getNotifications = async (req, res) => {
       // Await all the notificationPromise functions in Promise.all
       const notifications = await Promise.all(notificationsArrPromise);
 
-      res.json({ updatedUser, notifications });
+      const notificationsFiltered = notifications.filter((notification) => notification !== null);
+
+      res.json({ updatedUser, notifications: notificationsFiltered });
     }
     catch (err) {
       console.log(err);
@@ -88,9 +92,11 @@ exports.getNotifications = async (req, res) => {
       // Await all the notificationPromise functions in Promise.all
       const updatedNotifications = await Promise.all(notificationsArrPromise);
 
+      const notificationsFiltered = updatedNotifications.filter((notification) => notification !== null);
+
       // return success message and an updated notification object
       req.flash("success", { msg: "Notification has been read!" });
-      return res.json({ messages: req.flash(), updatedNotifications, updatedUser });
+      return res.json({ messages: req.flash(), updatedNotifications: notificationsFiltered, updatedUser });
     }
     catch (err) {
       console.log(err);
@@ -115,11 +121,13 @@ exports.getNotifications = async (req, res) => {
       // Await all the notificationPromise functions in Promise.all
       const updatedNotifications = await Promise.all(notificationsArrPromise);
 
+      const notificationsFiltered = updatedNotifications.filter((notification) => notification !== null);
+
       console.log("All user notifications have been set to read!")
 
       // return success message and an updated notification object
       req.flash("success", { msg: "All notifications have been read!" });
-      return res.json({ messages: req.flash(), updatedNotifications });
+      return res.json({ messages: req.flash(), updatedNotifications: notificationsFiltered });
     }
     catch (err) {
       console.log(err);
@@ -157,10 +165,12 @@ exports.deleteNotification = async (req, res) => {
 
       // Await all the notificationPromise functions in Promise.all
       const updatedNotifications = await Promise.all(notificationsArrPromise);
+      
+      const notificationsFiltered = updatedNotifications.filter((notification) => notification !== null);
 
       // return success message
       req.flash("success", { msg: "Notification has been deleted!" });
-      return res.json({ messages: req.flash(), updatedNotifications });
+      return res.json({ messages: req.flash(), updatedNotifications: notificationsFiltered });
     } catch (err) {
       console.log(err);
     }
@@ -351,12 +361,14 @@ exports.postLogin = (req, res, next) => {
       // Await all the notificationPromise functions in Promise.all
       const notifications = await Promise.all(notificationsArrPromise);
 
+      const notificationsFiltered = notifications.filter((notification) => notification !== null);
+
       const everyPost = await Post.find();
       const everyPostId = everyPost.map( (post) => post._id );
 
       // Send success message
       req.flash("success", { msg: "Success! You are logged in." });
-      res.json({ user, everyPostId, notifications, messages: req.flash() });
+      res.json({ user, everyPostId, notifications: notificationsFiltered, messages: req.flash() });
     });
   })(req, res, next);
 };

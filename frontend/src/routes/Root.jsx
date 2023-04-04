@@ -38,10 +38,12 @@ export default function Root() {
         if (res.user) {
           setUser(res.user);
           setEveryPostId(res.everyPostId);
-          setUserNotifications(res.notifications);
-          setUnreadUserNotifications(
-            res.notifications.some((notification) => !notification.read)
-          );
+          if (res.notifications.length) {
+            setUserNotifications(res.notifications);
+            setUnreadUserNotifications(
+              res.notifications.some((notification) => !notification.read)
+            );
+          }
         }
       });
   }, []);
