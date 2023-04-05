@@ -150,7 +150,7 @@ export default function Feed() {
             click={handleBakeryFilter}
           />
         </div>
-        {posts.length !== 0 && filteredPosts.length === 0 && (
+        {filteredPosts.length === 0 && (
           <p className="text-neutral text-center mt-5">
             ʕ•ᴥ•ʔ <br />
             No saved posts to show
