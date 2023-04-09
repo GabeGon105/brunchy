@@ -119,7 +119,6 @@ export default function Profile() {
       setImages({ files: [] });
       setUploadImages({ files: [] });
     }
-    console.log(uploadImages);
   };
 
   const handleFileChangeEdit = (e) => {

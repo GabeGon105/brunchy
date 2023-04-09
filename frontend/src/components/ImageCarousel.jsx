@@ -29,7 +29,12 @@ const ImageCarousel = ({ images, caption }) => (
       return (
         <SwiperSlide key={i} className="w-1/2">
           <div className="swiper-zoom-container">
-            <img src={image} alt={caption} className="mx-auto min-w-60" />
+            <img
+              src={image}
+              alt={caption}
+              className="mx-auto min-w-60"
+              style={{ maxHeight: "75vh" }}
+            />
           </div>
         </SwiperSlide>
       );
