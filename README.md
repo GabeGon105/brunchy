@@ -1,6 +1,6 @@
 # Brunchy
 
-Explore your city through brunches, breakfasts, and bakeries with Brunchy! A responsive, fullstack, MERN web application where you can can create an account, manage your own profile, and create, view, and share photos and information about your favorite brunch, breakfast, and bakery spots around your city.
+Explore your city through brunches, breakfasts, and bakeries with Brunchy! A responsive, fullstack, MERN web application where you can create an account, manage your own profile, and create, view, and share photos and information about your favorite brunch, breakfast, and bakery spots around your city.
 
 **Link to Brunchy:**
 
